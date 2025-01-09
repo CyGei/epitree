@@ -23,7 +23,7 @@ We are using the default `outbreaker2` data from the [vignette](https://cran.r-p
 ```{r}
 linelist <- data.frame(
   ids = as.character(1:30),
-  dates = outbreaker2::fake_outbreak$sample
+  dates = fake_outbreak$sample
 )
 
 # Define two distinct gamma distributions
@@ -53,15 +53,15 @@ n_chains <- 2
 set.seed(1)
 chains <-
   lapply(1:n_chains, function(i) {
-    x <- outbreaker2::outbreaker(
-      data = outbreaker2::outbreaker_data(
-        dna = outbreaker2::fake_outbreak$dna,
-        dates = outbreaker2::fake_outbreak$sample,
-        ctd = outbreaker2::fake_outbreak$ctd,
+    x <- outbreaker(
+      data = outbreaker_data(
+        dna = fake_outbreak$dna,
+        dates = fake_outbreak$sample,
+        ctd = fake_outbreak$ctd,
         w_dens = gt[[i]],
         ids = linelist$ids
       ),
-      config = outbreaker2::create_config(
+      config = create_config(
         init_pi = 1,
         move_pi = FALSE,
         find_import = FALSE

@@ -20,7 +20,7 @@ get_chisq <- function(...,
     if (ncol(df) != 2) {
       stop("Data must contain exactly two columns: 'from' and 'to'")
     }
-    tab <- as.data.frame(table(df[, 1], df[, 2]))
+    tab <- as.data.frame(table(df[, 1], df[, 2]), stringsAsFactors = FALSE)
     names(tab) <- c("from", "to", "Freq")
     return(tab)
   }
@@ -31,6 +31,7 @@ get_chisq <- function(...,
   tab <- Reduce(function(x, y)
     merge(x, y, by = c("from", "to"), all = TRUE), tabs)
   freq_cols <- grep("Freq", colnames(tab))
+  tab <- tab[complete.cases(tab), ]
   tab <- tab[rowSums(tab[, freq_cols]) > 0, ]
 
   pairs <- paste(tab$from, tab$to, sep = "-")

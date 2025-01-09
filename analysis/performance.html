@@ -1,0 +1,1044 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.6.39">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Assess the performance of the test</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="performance_files/libs/clipboard/clipboard.min.js"></script>
+<script src="performance_files/libs/quarto-html/quarto.js"></script>
+<script src="performance_files/libs/quarto-html/popper.min.js"></script>
+<script src="performance_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="performance_files/libs/quarto-html/anchor.min.js"></script>
+<link href="performance_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="performance_files/libs/quarto-html/quarto-syntax-highlighting-e26003cea8cd680ca0c55a263523d882.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="performance_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="performance_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="performance_files/libs/bootstrap/bootstrap-8a79a254b8e706d3c925cde0a310d4f0.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script src="performance_files/libs/htmlwidgets-1.6.4/htmlwidgets.js"></script>
+
+<link href="performance_files/libs/vis-9.1.0/vis-network.min.css" rel="stylesheet">
+
+<script src="performance_files/libs/vis-9.1.0/vis-network.min.js"></script>
+
+<script src="performance_files/libs/visNetwork-binding-2.1.2/visNetwork.js"></script>
+
+<link href="performance_files/libs/font-awesome-4.7.0/css/font-awesome.min.css" rel="stylesheet">
+
+<link href="performance_files/libs/htmltools-fill-0.5.8.1/fill.css" rel="stylesheet">
+
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="fullcontent">
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Assess the performance of the test</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>pacman<span class="sc">::</span><span class="fu">p_load</span>(outbreaker2, ape, igraph, vegan, distcrete, ggplot2, scales)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>pacman<span class="sc">::</span><span class="fu">p_load_gh</span>(<span class="st">"CyGei/o2ools"</span>)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>devtools<span class="sc">::</span><span class="fu">load_all</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<section id="type-i-error-false-positive" class="level1">
+<h1>Type I error (False Positive)</h1>
+<p>A Type I error, or false positive, occurs when the null hypothesis is rejected despite being true. In this context, it means concluding that two (or more) posterior chains differ when they are, in fact, identical.</p>
+<p>We run <code>outbreaker2</code> to produce a single posterior chain. We then create two (or more) bootstrapped samples by sampling with replacement from the same posterior chain and apply a statistical test to compare them. The test should yield a non-significant result (p-value &gt; 0.05) to correctly suggest no difference.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">outbreaker</span>(</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> <span class="fu">outbreaker_data</span>(</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">dna =</span> fake_outbreak<span class="sc">$</span>dna,</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">dates =</span> fake_outbreak<span class="sc">$</span>sample,</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">ctd =</span> fake_outbreak<span class="sc">$</span>ctd,</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">w_dens =</span> fake_outbreak<span class="sc">$</span>w,</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">ids =</span> <span class="fu">as.character</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">30</span>)</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>  ),</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">config =</span> <span class="fu">create_config</span>(</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">init_pi =</span> <span class="dv">1</span>,</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">move_pi =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">find_import =</span> <span class="cn">FALSE</span></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> x[x<span class="sc">$</span>step <span class="sc">&gt;</span> <span class="dv">1000</span>, ] <span class="co"># burnin</span></span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>chain <span class="ot">&lt;-</span> o2ools<span class="sc">::</span><span class="fu">get_trees</span>(<span class="at">out =</span> x, <span class="at">ids =</span>  <span class="fu">as.character</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">30</span>))</span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a><span class="co">#Function to remove the introduction in each tree of the chain (e.g. NA-&gt;1)</span></span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>prep_chain <span class="ot">&lt;-</span> <span class="cf">function</span>(chain) {</span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>  clean <span class="ot">&lt;-</span> <span class="fu">lapply</span>(chain, <span class="cf">function</span>(x) {</span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>    total_nas <span class="ot">&lt;-</span> <span class="fu">sum</span>(<span class="fu">is.na</span>(x))</span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>    from_nas <span class="ot">&lt;-</span> <span class="fu">sum</span>(<span class="fu">is.na</span>(x<span class="sc">$</span>from))</span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> (total_nas <span class="sc">==</span> <span class="dv">1</span> <span class="sc">&amp;&amp;</span> from_nas <span class="sc">==</span> <span class="dv">1</span>) {</span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a>      x <span class="ot">&lt;-</span> x[<span class="sc">!</span><span class="fu">is.na</span>(x<span class="sc">$</span>from), ]</span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a>      x[] <span class="ot">&lt;-</span> <span class="fu">lapply</span>(x, as.character)</span>
+<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a>      <span class="fu">return</span>(x)</span>
+<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a>    } <span class="cf">else</span> {</span>
+<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a>      <span class="fu">stop</span>(<span class="st">"DataFrame must have exactly one NA, and it must be in the 'from' column"</span>)</span>
+<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a>  })</span>
+<span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(clean)</span>
+<span id="cb2-34"><a href="#cb2-34" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb2-35"><a href="#cb2-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-36"><a href="#cb2-36" aria-hidden="true" tabindex="-1"></a>chain <span class="ot">&lt;-</span> <span class="fu">prep_chain</span>(chain)</span>
+<span id="cb2-37"><a href="#cb2-37" aria-hidden="true" tabindex="-1"></a><span class="fu">invisible</span>(<span class="fu">lapply</span>(chain, check_tree)) <span class="co"># checks that the trees are in the right format</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<section id="chi-square-test" class="level2">
+<h2 class="anchored" data-anchor-id="chi-square-test">Chi-square test</h2>
+<p>The chi-square test is performed 100 times, with new samples drawn for each iteration. Under the null hypothesis, we expect around 5% of the tests to yield a p-value &lt; 0.05 due to random chance.</p>
+<p>For example:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>lambda <span class="ot">&lt;-</span> <span class="dv">20</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>t <span class="ot">&lt;-</span> <span class="fu">replicate</span>(<span class="dv">1000</span>, {</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  x <span class="ot">&lt;-</span> <span class="fu">rpois</span>(<span class="at">n =</span> <span class="dv">10</span>, lambda)</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  y <span class="ot">&lt;-</span> <span class="fu">rpois</span>(<span class="at">n =</span> <span class="dv">10</span>, lambda)</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">chisq.test</span>(<span class="fu">cbind</span>(x, y))<span class="sc">$</span>p.value</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>})</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="fu">mean</span>(t <span class="sc">&lt;</span> <span class="fl">0.05</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 0.057</code></pre>
+</div>
+</div>
+<p>Note that when <span class="math inline">\(\lambda\)</span> is small (<em>e.g.</em> when a cell in the contingency table has a value &lt;5), Fisher’s exact test should be used instead. This is particularly relevant when comparing posterior chains, as it is possible for a pair, such as A-&gt;B, to appear a few times in one chain but never (0) in the other.</p>
+<p>To assess the sensitivity of the test to sample size, we vary the number of trees sampled from the posterior distribution (<code>chain</code>) in each replication.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>sample_sizes <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">10</span>, <span class="dv">50</span>, <span class="dv">100</span>, <span class="dv">500</span>)</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">111</span>)</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>results <span class="ot">&lt;-</span> <span class="fu">lapply</span>(sample_sizes, <span class="cf">function</span>(n) {</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>  test <span class="ot">&lt;-</span> <span class="fu">replicate</span>(<span class="dv">100</span>, {</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">get_chisq</span>(</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>      <span class="fu">sample</span>(chain, <span class="at">size =</span> n, <span class="at">replace =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>      <span class="fu">sample</span>(chain, <span class="at">size =</span> n, <span class="at">replace =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>      <span class="co">#test_args = list(simulate.p.value = TRUE, B = 1000)</span></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>    )<span class="sc">$</span>p.value</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>  })</span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(<span class="fu">mean</span>(test <span class="sc">&lt;</span> <span class="fl">0.05</span>))</span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>})</span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(results) <span class="ot">&lt;-</span> <span class="fu">paste</span>(<span class="st">"Sample Size:"</span>, sample_sizes)</span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>results</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>$`Sample Size: 10`
+[1] 0
+
+$`Sample Size: 50`
+[1] 0
+
+$`Sample Size: 100`
+[1] 0
+
+$`Sample Size: 500`
+[1] 0</code></pre>
+</div>
+</div>
+<p>We don’t observe the expected 5% of false positives likely because the chi-square test is used with low frequencies. Fisher’s test is computationally intensive, so we won’t try it out here but you can specify <code>method = "fisher"</code>.</p>
+</section>
+<section id="permanova" class="level2">
+<h2 class="anchored" data-anchor-id="permanova">PERMANOVA</h2>
+<p>This will take a while to run - so we use only 1 iteration…</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>sample_sizes <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">10</span>, <span class="dv">50</span>, <span class="dv">100</span>, <span class="dv">500</span>)</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>results <span class="ot">&lt;-</span> <span class="fu">lapply</span>(sample_sizes, <span class="cf">function</span>(n) {</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  test <span class="ot">&lt;-</span> <span class="fu">replicate</span>(<span class="dv">1</span>, {</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">compare_chains</span>(<span class="fu">sample</span>(chain, <span class="at">size =</span> n, <span class="at">replace =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>                   <span class="fu">sample</span>(chain, <span class="at">size =</span> n, <span class="at">replace =</span> <span class="cn">TRUE</span>))<span class="sc">$</span><span class="st">`</span><span class="at">Pr(&gt;F)</span><span class="st">`</span>[<span class="dv">1</span>]</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>  })</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>})</span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(results) <span class="ot">&lt;-</span> <span class="fu">paste</span>(<span class="st">"Sample Size:"</span>, sample_sizes)</span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>results</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>$`Sample Size: 10`
+[1] 0.005
+
+$`Sample Size: 50`
+[1] 0.25
+
+$`Sample Size: 100`
+[1] 0.203
+
+$`Sample Size: 500`
+[1] 0.479</code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="type-ii-error-false-negative" class="level1">
+<h1>Type II error (False Negative)</h1>
+<p>A Type II error, or false negative, occurs when the null hypothesis is accepted despite being false. In this context, it means concluding that two (or more) posterior chains are identical when they are, in fact, different.</p>
+<p>To assess a Type II error, we require at least two distinct outbreak scenarios. For example, one scenario involving super-spreading (heterogeneous transmission) and another with no over-dispersion (homogeneous transmission) where all individuals have the same reproduction number <span class="math inline">\(R\)</span>).</p>
+<p>The package <code>simulacr</code> will help us simulate such outbreaks.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>pacman<span class="sc">::</span><span class="fu">p_load_gh</span>(<span class="st">"CyGei/simulacr"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<section id="super-spreading-outbreak" class="level2">
+<h2 class="anchored" data-anchor-id="super-spreading-outbreak">Super-spreading outbreak</h2>
+<section id="true-transmission-tree" class="level3">
+<h3 class="anchored" data-anchor-id="true-transmission-tree">True transmission tree</h3>
+<p>We specify an offspring distribution using <code>rnbinom(n = 100, size = 0.2, mu = 3)</code>, where the small dispersion parameter (<span class="math inline">\(k\)</span> or <code>size</code>), indicates high overdispersion. This results in heterogeneous transmission, with substantial variation in the number of secondary cases generated by each infector.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">111</span>)</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>sim_ss <span class="ot">&lt;-</span> </span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>  simulacr<span class="sc">::</span><span class="fu">simulate_outbreak</span>(</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">duration =</span> <span class="dv">100</span>,</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">population_size =</span> <span class="dv">20</span>,</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">R_values =</span> <span class="fu">rnbinom</span>(<span class="at">n =</span> <span class="dv">100</span>, <span class="at">size =</span> <span class="fl">0.2</span>, <span class="at">mu =</span> <span class="dv">3</span>), <span class="co">#size is k (dispersion parameter)</span></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">dist_incubation =</span> fake_outbreak<span class="sc">$</span>w,</span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">dist_generation_time =</span> fake_outbreak<span class="sc">$</span>w</span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>)<span class="sc">$</span>data</span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>epic_ss <span class="ot">&lt;-</span> <span class="fu">as_epicontacts</span>(sim_ss)</span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(epic_ss)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div id="htmlwidget-3fb3975998576b9c913c" style="width:90%;height:700px;" class="visNetwork html-widget"></div>
+<script type="application/json" data-for="htmlwidget-3fb3975998576b9c913c">{"x":{"nodes":{"id":["27HBln","6BxfHG","Aeg0eP","E0n0Xv","gKQyPG","gnwXuz","iWBKA8","jRB2lI","kXGcqN","lGDY3w","mDCSBS","oHXqIx","QnJfOo","r5d1ev","TJsdUJ","u2BTay","UhRuWL","WneQJc","ZFRPSg"],"date_infection":[2,4,2,0,4,1,1,1,1,2,2,2,1,4,2,4,1,1,1],"date_onset":[5,7,4,2,6,1,4,4,2,3,3,5,2,6,2,7,3,2,2],"label":["27HBln","6BxfHG","Aeg0eP","E0n0Xv","gKQyPG","gnwXuz","iWBKA8","jRB2lI","kXGcqN","lGDY3w","mDCSBS","oHXqIx","QnJfOo","r5d1ev","TJsdUJ","u2BTay","UhRuWL","WneQJc","ZFRPSg"],"title":["<p> id: 27HBln<br>date_infection: 2<br>date_onset: 5 <\/p>","<p> id: 6BxfHG<br>date_infection: 4<br>date_onset: 7 <\/p>","<p> id: Aeg0eP<br>date_infection: 2<br>date_onset: 4 <\/p>","<p> id: E0n0Xv<br>date_infection: 0<br>date_onset: 2 <\/p>","<p> id: gKQyPG<br>date_infection: 4<br>date_onset: 6 <\/p>","<p> id: gnwXuz<br>date_infection: 1<br>date_onset: 1 <\/p>","<p> id: iWBKA8<br>date_infection: 1<br>date_onset: 4 <\/p>","<p> id: jRB2lI<br>date_infection: 1<br>date_onset: 4 <\/p>","<p> id: kXGcqN<br>date_infection: 1<br>date_onset: 2 <\/p>","<p> id: lGDY3w<br>date_infection: 2<br>date_onset: 3 <\/p>","<p> id: mDCSBS<br>date_infection: 2<br>date_onset: 3 <\/p>","<p> id: oHXqIx<br>date_infection: 2<br>date_onset: 5 <\/p>","<p> id: QnJfOo<br>date_infection: 1<br>date_onset: 2 <\/p>","<p> id: r5d1ev<br>date_infection: 4<br>date_onset: 6 <\/p>","<p> id: TJsdUJ<br>date_infection: 2<br>date_onset: 2 <\/p>","<p> id: u2BTay<br>date_infection: 4<br>date_onset: 7 <\/p>","<p> id: UhRuWL<br>date_infection: 1<br>date_onset: 3 <\/p>","<p> id: WneQJc<br>date_infection: 1<br>date_onset: 2 <\/p>","<p> id: ZFRPSg<br>date_infection: 1<br>date_onset: 2 <\/p>"],"color":["#CCDDFF","#A2D7D2","#79D2A6","#BCC2AC","#FFB3B3","#D1ABBA","#A4A4C1","#D1B860","#FFCC00","#FFB540","#FF9F80","#E5CE8C","#CCFF99","#D5CEAC","#DF9FBF","#EFB5AC","#FFCC99","#E6CCB3","#CDCDCD"],"borderWidth":[2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2]},"edges":{"from":["E0n0Xv","E0n0Xv","E0n0Xv","E0n0Xv","E0n0Xv","E0n0Xv","E0n0Xv","E0n0Xv","E0n0Xv","E0n0Xv","E0n0Xv","E0n0Xv","E0n0Xv","UhRuWL","UhRuWL","WneQJc","oHXqIx","UhRuWL"],"to":["UhRuWL","kXGcqN","jRB2lI","iWBKA8","ZFRPSg","gnwXuz","WneQJc","QnJfOo","oHXqIx","27HBln","lGDY3w","mDCSBS","TJsdUJ","Aeg0eP","r5d1ev","6BxfHG","u2BTay","gKQyPG"],"width":[3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3],"arrows":["to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to"]},"nodesToDataframe":true,"edgesToDataframe":true,"options":{"width":"100%","height":"100%","nodes":{"shape":"dot"},"manipulation":{"enabled":false},"physics":{"stabilization":false}},"groups":null,"width":"90%","height":"700px","idselection":{"enabled":false,"style":"width: 150px; height: 26px","useLabels":true,"main":"Select by id"},"byselection":{"enabled":true,"style":"width: 150px; height: 26px","multiple":false,"hideColor":"rgba(200,200,200,0.5)","highlight":false,"variable":"id","main":"Select by id","values":["27HBln","6BxfHG","Aeg0eP","E0n0Xv","gKQyPG","gnwXuz","iWBKA8","jRB2lI","kXGcqN","lGDY3w","mDCSBS","oHXqIx","QnJfOo","r5d1ev","TJsdUJ","u2BTay","UhRuWL","WneQJc","ZFRPSg"]},"main":null,"submain":null,"footer":null,"background":"rgba(0, 0, 0, 0)","legend":{"width":0.2,"useGroups":false,"position":"left","ncol":1,"stepX":100,"stepY":100,"zoom":true},"highlight":{"enabled":true,"hoverNearest":false,"degree":1,"algorithm":"all","hideColor":"rgba(200,200,200,0.5)","labelOnly":true},"collapse":{"enabled":false,"fit":false,"resetHighlight":true,"clusterOptions":null,"keepCoord":true,"labelSuffix":"(cluster)"},"opts_manipulation":{"datacss":"table.legend_table {\n  font-size: 11px;\n  border-width:1px;\n  border-color:#d3d3d3;\n  border-style:solid;\n}\ntable.legend_table td {\n  border-width:1px;\n  border-color:#d3d3d3;\n  border-style:solid;\n  padding: 2px;\n}\ndiv.table_content {\n  width:80px;\n  text-align:center;\n}\ndiv.table_description {\n  width:100px;\n}\n\n.operation {\n  font-size:20px;\n}\n\n.network-popUp {\n  display:none;\n  z-index:299;\n  width:250px;\n  /*height:150px;*/\n  background-color: #f9f9f9;\n  border-style:solid;\n  border-width:1px;\n  border-color: #0d0d0d;\n  padding:10px;\n  text-align: center;\n  position:fixed;\n  top:50%;  \n  left:50%;  \n  margin:-100px 0 0 -100px;  \n\n}","addNodeCols":["id","label"],"editNodeCols":["id","label"],"tab_add_node":"<span id=\"addnode-operation\" class = \"operation\">node<\/span> <br><table style=\"margin:auto;\"><tr><td>id<\/td><td><input id=\"addnode-id\"  type= \"text\" value=\"new value\"><\/td><\/tr><tr><td>label<\/td><td><input id=\"addnode-label\"  type= \"text\" value=\"new value\"><\/td><\/tr><\/table><input type=\"button\" value=\"save\" id=\"addnode-saveButton\"><\/button><input type=\"button\" value=\"cancel\" id=\"addnode-cancelButton\"><\/button>","tab_edit_node":"<span id=\"editnode-operation\" class = \"operation\">node<\/span> <br><table style=\"margin:auto;\"><tr><td>id<\/td><td><input id=\"editnode-id\"  type= \"text\" value=\"new value\"><\/td><\/tr><tr><td>label<\/td><td><input id=\"editnode-label\"  type= \"text\" value=\"new value\"><\/td><\/tr><\/table><input type=\"button\" value=\"save\" id=\"editnode-saveButton\"><\/button><input type=\"button\" value=\"cancel\" id=\"editnode-cancelButton\"><\/button>"},"iconsRedraw":true},"evals":[],"jsHooks":[]}</script>
+</div>
+</div>
+</section>
+<section id="outbreak-reconstruction" class="level3">
+<h3 class="anchored" data-anchor-id="outbreak-reconstruction">Outbreak reconstruction</h3>
+<p>Let’s use <code>sim_ss</code>’s data as input for <code>outbreaker2</code>. The resulting output we’ll use is called <code>chain_ss</code>.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>out_ss <span class="ot">&lt;-</span> <span class="fu">outbreaker</span>(</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> <span class="fu">outbreaker_data</span>(</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">dates =</span> sim_ss<span class="sc">$</span>date_onset,</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">ctd =</span> epic_ss<span class="sc">$</span>contacts[<span class="sc">-</span><span class="dv">1</span>, ],</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">w_dens =</span> fake_outbreak<span class="sc">$</span>w,</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">ids =</span> <span class="fu">as.character</span>(epic_ss<span class="sc">$</span>linelist<span class="sc">$</span>id)</span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>  ),</span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">config =</span> <span class="fu">create_config</span>(</span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">init_pi =</span> <span class="dv">1</span>,</span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">move_pi =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">find_import =</span> <span class="cn">FALSE</span></span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(out_ss)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="performance_files/figure-html/unnamed-chunk-8-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>out_ss <span class="ot">&lt;-</span> out_ss[out_ss<span class="sc">$</span>step <span class="sc">&gt;</span> <span class="dv">1000</span>, ] <span class="co"># burnin</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(out_ss, <span class="at">type =</span> <span class="st">"network"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div class="visNetwork html-widget html-fill-item" id="htmlwidget-549ecb283b95cbf0a7b6" style="width:100%;height:464px;"></div>
+<script type="application/json" data-for="htmlwidget-549ecb283b95cbf0a7b6">{"x":{"nodes":{"id":[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19],"label":[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19],"value":[13.00555555555556,3,0,0,0,0,0,0.9777777777777777,0,0.9944444444444445,0.005555555555555556,0.005555555555555556,0,0.005555555555555556,0.005555555555555556,0,0,0,0],"color":["#CCDDFF","#A2D7D2","#79D2A6","#BCC2AC","#FFB3B3","#D1ABBA","#A4A4C1","#D1B860","#FFCC00","#FFB540","#FF9F80","#E5CE8C","#CCFF99","#D5CEAC","#DF9FBF","#EFB5AC","#FFCC99","#E6CCB3","#CDCDCD"],"shape":["dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot"],"shaped":["star",null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null]},"edges":{"from":[1,1,1,1,1,1,1,1,1,1,1,1,1,2,2,2,8,10],"to":[2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,19,17,18],"value":[1,1,1,1,1,1,1,1,1,1,1,1,1,0.9944444444444445,1,1,0.9777777777777777,0.9944444444444445],"arrows":["to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to"],"color":["#CCDDFF","#CCDDFF","#CCDDFF","#CCDDFF","#CCDDFF","#CCDDFF","#CCDDFF","#CCDDFF","#CCDDFF","#CCDDFF","#CCDDFF","#CCDDFF","#CCDDFF","#A2D7D2","#A2D7D2","#A2D7D2","#D1B860","#FFB540"]},"nodesToDataframe":true,"edgesToDataframe":true,"options":{"width":"100%","height":"100%","nodes":{"shape":"dot","color":{"highlight":"red"},"shadow":{"enabled":true,"size":10}},"manipulation":{"enabled":false},"edges":{"arrows":{"to":{"enabled":true,"scaleFactor":0.2}},"color":{"highlight":"red"}}},"groups":null,"width":null,"height":null,"idselection":{"enabled":false},"byselection":{"enabled":false},"main":null,"submain":null,"footer":null,"background":"rgba(0, 0, 0, 0)"},"evals":[],"jsHooks":[]}</script>
+</div>
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>chain <span class="ot">&lt;-</span> <span class="fu">get_trees</span>(<span class="at">out =</span> out_ss, <span class="at">ids =</span> <span class="fu">as.character</span>(epic_ss<span class="sc">$</span>linelist<span class="sc">$</span>id))</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>chain_ss <span class="ot">&lt;-</span> <span class="fu">prep_chain</span>(chain)</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="fu">invisible</span>(<span class="fu">lapply</span>(chain_ss, check_tree))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Check that <code>outbreaker2</code> did a good job by computing the proportion of correctly assigned ancestries.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>o2ools<span class="sc">::</span><span class="fu">get_accuracy</span>(chain_ss, epic_ss<span class="sc">$</span>contacts[<span class="sc">-</span><span class="dv">1</span>, ]) <span class="sc">%&gt;%</span> </span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">density</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">plot</span>(</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">main =</span> <span class="st">"Accuracy of outbreak reconstruction"</span>,</span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">xlab =</span> <span class="st">"% of correctly inferred ancestries"</span>,</span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">ylab =</span> <span class="st">"Density"</span></span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="performance_files/figure-html/unnamed-chunk-9-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="uniform-outbreak" class="level2">
+<h2 class="anchored" data-anchor-id="uniform-outbreak">“Uniform” outbreak</h2>
+<section id="true-transmission-tree-1" class="level3">
+<h3 class="anchored" data-anchor-id="true-transmission-tree-1">True transmission tree</h3>
+<p>Here we provide the same reproduction number <span class="math inline">\(R\)</span> for everyone. For fair comparison, I ran a separate script to find a random seed that yields the same number of cases as <code>out_ss</code> and we’ll assign randomly the case IDs from <code>out_ss</code> to the below. The resulting output we’ll use is called <code>chain_uni</code>.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">3961</span>)</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>sim_uni <span class="ot">&lt;-</span> </span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>  simulacr<span class="sc">::</span><span class="fu">simulate_outbreak</span>(</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">duration =</span> <span class="dv">100</span>,</span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">population_size =</span> <span class="dv">20</span>,</span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">R_values =</span> <span class="dv">1</span>L,</span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">dist_incubation =</span> fake_outbreak<span class="sc">$</span>w,</span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">dist_generation_time =</span> fake_outbreak<span class="sc">$</span>w</span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>)<span class="sc">$</span>data</span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a>epic_uni <span class="ot">&lt;-</span> <span class="fu">as_epicontacts</span>(sim_uni)</span>
+<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(epic_uni)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div id="htmlwidget-2fed9e3b03ea7389b9fc" style="width:90%;height:700px;" class="visNetwork html-widget"></div>
+<script type="application/json" data-for="htmlwidget-2fed9e3b03ea7389b9fc">{"x":{"nodes":{"id":["2Rosfs","6Ln8kF","7UHuVi","bKQf3Q","bx4ama","Cw2HOY","CZXjrv","G1jkLU","g8fmbz","GHpjZn","gKnVhD","MkOe3b","mwNH4z","PK1o5Z","QyWeX6","TNxVfz","U2R8Hj","wQBI3N","YolBm4"],"date_infection":[5,4,7,12,4,9,13,6,12,6,0,11,5,14,3,2,3,3,6],"date_onset":[8,5,9,13,5,12,16,9,14,7,1,14,6,15,6,4,5,4,7],"label":["2Rosfs","6Ln8kF","7UHuVi","bKQf3Q","bx4ama","Cw2HOY","CZXjrv","G1jkLU","g8fmbz","GHpjZn","gKnVhD","MkOe3b","mwNH4z","PK1o5Z","QyWeX6","TNxVfz","U2R8Hj","wQBI3N","YolBm4"],"title":["<p> id: 2Rosfs<br>date_infection: 5<br>date_onset: 8 <\/p>","<p> id: 6Ln8kF<br>date_infection: 4<br>date_onset: 5 <\/p>","<p> id: 7UHuVi<br>date_infection: 7<br>date_onset: 9 <\/p>","<p> id: bKQf3Q<br>date_infection: 12<br>date_onset: 13 <\/p>","<p> id: bx4ama<br>date_infection: 4<br>date_onset: 5 <\/p>","<p> id: Cw2HOY<br>date_infection: 9<br>date_onset: 12 <\/p>","<p> id: CZXjrv<br>date_infection: 13<br>date_onset: 16 <\/p>","<p> id: G1jkLU<br>date_infection: 6<br>date_onset: 9 <\/p>","<p> id: g8fmbz<br>date_infection: 12<br>date_onset: 14 <\/p>","<p> id: GHpjZn<br>date_infection: 6<br>date_onset: 7 <\/p>","<p> id: gKnVhD<br>date_infection: 0<br>date_onset: 1 <\/p>","<p> id: MkOe3b<br>date_infection: 11<br>date_onset: 14 <\/p>","<p> id: mwNH4z<br>date_infection: 5<br>date_onset: 6 <\/p>","<p> id: PK1o5Z<br>date_infection: 14<br>date_onset: 15 <\/p>","<p> id: QyWeX6<br>date_infection: 3<br>date_onset: 6 <\/p>","<p> id: TNxVfz<br>date_infection: 2<br>date_onset: 4 <\/p>","<p> id: U2R8Hj<br>date_infection: 3<br>date_onset: 5 <\/p>","<p> id: wQBI3N<br>date_infection: 3<br>date_onset: 4 <\/p>","<p> id: YolBm4<br>date_infection: 6<br>date_onset: 7 <\/p>"],"color":["#CCDDFF","#A2D7D2","#79D2A6","#BCC2AC","#FFB3B3","#D1ABBA","#A4A4C1","#D1B860","#FFCC00","#FFB540","#FF9F80","#E5CE8C","#CCFF99","#D5CEAC","#DF9FBF","#EFB5AC","#FFCC99","#E6CCB3","#CDCDCD"],"borderWidth":[2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2]},"edges":{"from":["gKnVhD","gKnVhD","TNxVfz","TNxVfz","QyWeX6","U2R8Hj","bx4ama","QyWeX6","6Ln8kF","wQBI3N","wQBI3N","GHpjZn","YolBm4","Cw2HOY","MkOe3b","Cw2HOY","MkOe3b","MkOe3b"],"to":["TNxVfz","QyWeX6","U2R8Hj","wQBI3N","bx4ama","6Ln8kF","mwNH4z","2Rosfs","GHpjZn","YolBm4","G1jkLU","7UHuVi","Cw2HOY","MkOe3b","g8fmbz","bKQf3Q","CZXjrv","PK1o5Z"],"width":[3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3],"arrows":["to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to"]},"nodesToDataframe":true,"edgesToDataframe":true,"options":{"width":"100%","height":"100%","nodes":{"shape":"dot"},"manipulation":{"enabled":false},"physics":{"stabilization":false}},"groups":null,"width":"90%","height":"700px","idselection":{"enabled":false,"style":"width: 150px; height: 26px","useLabels":true,"main":"Select by id"},"byselection":{"enabled":true,"style":"width: 150px; height: 26px","multiple":false,"hideColor":"rgba(200,200,200,0.5)","highlight":false,"variable":"id","main":"Select by id","values":["2Rosfs","6Ln8kF","7UHuVi","bKQf3Q","bx4ama","Cw2HOY","CZXjrv","G1jkLU","g8fmbz","GHpjZn","gKnVhD","MkOe3b","mwNH4z","PK1o5Z","QyWeX6","TNxVfz","U2R8Hj","wQBI3N","YolBm4"]},"main":null,"submain":null,"footer":null,"background":"rgba(0, 0, 0, 0)","legend":{"width":0.2,"useGroups":false,"position":"left","ncol":1,"stepX":100,"stepY":100,"zoom":true},"highlight":{"enabled":true,"hoverNearest":false,"degree":1,"algorithm":"all","hideColor":"rgba(200,200,200,0.5)","labelOnly":true},"collapse":{"enabled":false,"fit":false,"resetHighlight":true,"clusterOptions":null,"keepCoord":true,"labelSuffix":"(cluster)"},"opts_manipulation":{"datacss":"table.legend_table {\n  font-size: 11px;\n  border-width:1px;\n  border-color:#d3d3d3;\n  border-style:solid;\n}\ntable.legend_table td {\n  border-width:1px;\n  border-color:#d3d3d3;\n  border-style:solid;\n  padding: 2px;\n}\ndiv.table_content {\n  width:80px;\n  text-align:center;\n}\ndiv.table_description {\n  width:100px;\n}\n\n.operation {\n  font-size:20px;\n}\n\n.network-popUp {\n  display:none;\n  z-index:299;\n  width:250px;\n  /*height:150px;*/\n  background-color: #f9f9f9;\n  border-style:solid;\n  border-width:1px;\n  border-color: #0d0d0d;\n  padding:10px;\n  text-align: center;\n  position:fixed;\n  top:50%;  \n  left:50%;  \n  margin:-100px 0 0 -100px;  \n\n}","addNodeCols":["id","label"],"editNodeCols":["id","label"],"tab_add_node":"<span id=\"addnode-operation\" class = \"operation\">node<\/span> <br><table style=\"margin:auto;\"><tr><td>id<\/td><td><input id=\"addnode-id\"  type= \"text\" value=\"new value\"><\/td><\/tr><tr><td>label<\/td><td><input id=\"addnode-label\"  type= \"text\" value=\"new value\"><\/td><\/tr><\/table><input type=\"button\" value=\"save\" id=\"addnode-saveButton\"><\/button><input type=\"button\" value=\"cancel\" id=\"addnode-cancelButton\"><\/button>","tab_edit_node":"<span id=\"editnode-operation\" class = \"operation\">node<\/span> <br><table style=\"margin:auto;\"><tr><td>id<\/td><td><input id=\"editnode-id\"  type= \"text\" value=\"new value\"><\/td><\/tr><tr><td>label<\/td><td><input id=\"editnode-label\"  type= \"text\" value=\"new value\"><\/td><\/tr><\/table><input type=\"button\" value=\"save\" id=\"editnode-saveButton\"><\/button><input type=\"button\" value=\"cancel\" id=\"editnode-cancelButton\"><\/button>"},"iconsRedraw":true},"evals":[],"jsHooks":[]}</script>
+</div>
+</div>
+<p><span class="citation" data-cites="Thibaut">@Thibaut</span> <code>R_values</code> is not respected (some cases have R=2). Is this normal?</p>
+</section>
+<section id="outbreak-reconstruction-1" class="level3">
+<h3 class="anchored" data-anchor-id="outbreak-reconstruction-1">Outbreak reconstruction</h3>
+<p>Let’s use <code>sim_uni</code>’s data as input for <code>outbreaker2</code>.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>out_uni <span class="ot">&lt;-</span> <span class="fu">outbreaker</span>(</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> <span class="fu">outbreaker_data</span>(</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">dates =</span> sim_uni<span class="sc">$</span>date_onset,</span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">ctd =</span> epic_uni<span class="sc">$</span>contacts[<span class="sc">-</span><span class="dv">1</span>, ],</span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">w_dens =</span> fake_outbreak<span class="sc">$</span>w,</span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">ids =</span> <span class="fu">as.character</span>(epic_uni<span class="sc">$</span>linelist<span class="sc">$</span>id)</span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>  ),</span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">config =</span> <span class="fu">create_config</span>(</span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">init_pi =</span> <span class="dv">1</span>,</span>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">move_pi =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">find_import =</span> <span class="cn">FALSE</span></span>
+<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb16-13"><a href="#cb16-13" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb16-14"><a href="#cb16-14" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(out_uni)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="performance_files/figure-html/unnamed-chunk-11-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>out_uni <span class="ot">&lt;-</span> out_uni[out_uni<span class="sc">$</span>step <span class="sc">&gt;</span> <span class="dv">1000</span>, ] <span class="co"># burnin</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(out_uni, <span class="at">type =</span> <span class="st">"network"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div class="visNetwork html-widget html-fill-item" id="htmlwidget-cfa5e1bb0c4a5adf571a" style="width:100%;height:464px;"></div>
+<script type="application/json" data-for="htmlwidget-cfa5e1bb0c4a5adf571a">{"x":{"nodes":{"id":[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19],"label":[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19],"value":[2.372222222222222,2.122222222222222,1.472222222222222,0.7722222222222223,1.994444444444444,1.283333333333333,0.9944444444444445,0.005555555555555556,0.005555555555555556,0.9722222222222222,1.005555555555556,0.01111111111111111,0.03333333333333333,2.011111111111111,2.927777777777778,0,0.01666666666666667,0,0],"color":["#CCDDFF","#A2D7D2","#79D2A6","#BCC2AC","#FFB3B3","#D1ABBA","#A4A4C1","#D1B860","#FFCC00","#FFB540","#FF9F80","#E5CE8C","#CCFF99","#D5CEAC","#DF9FBF","#EFB5AC","#FFCC99","#E6CCB3","#CDCDCD"],"shape":["dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot"],"shaped":["star",null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null]},"edges":{"from":[1,1,1,1,2,2,3,3,4,5,5,6,6,7,10,11,14,14,15,15,15],"to":[2,3,6,7,4,5,6,9,7,11,12,3,8,10,13,14,15,17,16,18,19],"value":[1,0.7055555555555556,0.4611111111111111,0.1888888888888889,0.9555555555555556,0.9888888888888889,0.4666666666666667,0.9833333333333333,0.75,0.9944444444444445,0.9888888888888889,0.2833333333333333,0.9722222222222222,0.9388888888888889,0.9722222222222222,0.9944444444444445,0.9833333333333333,0.9944444444444445,0.9388888888888889,1,0.9888888888888889],"arrows":["to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to"],"color":["#CCDDFF","#CCDDFF","#CCDDFF","#CCDDFF","#A2D7D2","#A2D7D2","#79D2A6","#79D2A6","#BCC2AC","#FFB3B3","#FFB3B3","#D1ABBA","#D1ABBA","#A4A4C1","#FFB540","#FF9F80","#D5CEAC","#D5CEAC","#DF9FBF","#DF9FBF","#DF9FBF"]},"nodesToDataframe":true,"edgesToDataframe":true,"options":{"width":"100%","height":"100%","nodes":{"shape":"dot","color":{"highlight":"red"},"shadow":{"enabled":true,"size":10}},"manipulation":{"enabled":false},"edges":{"arrows":{"to":{"enabled":true,"scaleFactor":0.2}},"color":{"highlight":"red"}}},"groups":null,"width":null,"height":null,"idselection":{"enabled":false},"byselection":{"enabled":false},"main":null,"submain":null,"footer":null,"background":"rgba(0, 0, 0, 0)"},"evals":[],"jsHooks":[]}</script>
+</div>
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="co"># assign the IDs from sim_ss</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>common_ids <span class="ot">&lt;-</span> <span class="fu">sample</span>(<span class="fu">as.character</span>(epic_ss<span class="sc">$</span>linelist<span class="sc">$</span>id))</span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>chain <span class="ot">&lt;-</span> <span class="fu">get_trees</span>(<span class="at">out =</span> out_uni, <span class="at">ids =</span> common_ids)</span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>chain_uni <span class="ot">&lt;-</span> <span class="fu">prep_chain</span>(chain)</span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a><span class="fu">invisible</span>(<span class="fu">lapply</span>(chain_uni, check_tree))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+</section>
+<section id="comparing-two-distinct-posterior-chains" class="level2">
+<h2 class="anchored" data-anchor-id="comparing-two-distinct-posterior-chains">Comparing two distinct posterior chains</h2>
+<section id="chi-square-test-1" class="level3">
+<h3 class="anchored" data-anchor-id="chi-square-test-1">Chi-square test</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>sample_sizes <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">10</span>, <span class="dv">50</span>, <span class="dv">100</span>, <span class="dv">500</span>)</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">111</span>)</span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>results <span class="ot">&lt;-</span> <span class="fu">lapply</span>(sample_sizes, <span class="cf">function</span>(n) {</span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>  test <span class="ot">&lt;-</span> <span class="fu">replicate</span>(<span class="dv">100</span>, {</span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">get_chisq</span>(</span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>      <span class="fu">sample</span>(chain_ss, <span class="at">size =</span> n, <span class="at">replace =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>      <span class="fu">sample</span>(chain_uni, <span class="at">size =</span> n, <span class="at">replace =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a>      <span class="co">#test_args = list(simulate.p.value = TRUE, B = 1000)</span></span>
+<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a>    )<span class="sc">$</span>p.value</span>
+<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a>  })</span>
+<span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb19-12"><a href="#cb19-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(<span class="fu">mean</span>(test <span class="sc">&lt;</span> <span class="fl">0.05</span>))</span>
+<span id="cb19-13"><a href="#cb19-13" aria-hidden="true" tabindex="-1"></a>})</span>
+<span id="cb19-14"><a href="#cb19-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-15"><a href="#cb19-15" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(results) <span class="ot">&lt;-</span> <span class="fu">paste</span>(<span class="st">"Sample Size:"</span>, sample_sizes)</span>
+<span id="cb19-16"><a href="#cb19-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-17"><a href="#cb19-17" aria-hidden="true" tabindex="-1"></a>results</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>$`Sample Size: 10`
+[1] 1
+
+$`Sample Size: 50`
+[1] 1
+
+$`Sample Size: 100`
+[1] 1
+
+$`Sample Size: 500`
+[1] 1</code></pre>
+</div>
+</div>
+</section>
+<section id="permanova-1" class="level3">
+<h3 class="anchored" data-anchor-id="permanova-1">PERMANOVA</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>sample_sizes <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">10</span>, <span class="dv">50</span>, <span class="dv">100</span>, <span class="dv">500</span>)</span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a><span class="fu">system.time</span>({</span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>  results <span class="ot">&lt;-</span> <span class="fu">lapply</span>(sample_sizes, <span class="cf">function</span>(n) {</span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>    test <span class="ot">&lt;-</span> <span class="fu">replicate</span>(<span class="dv">1</span>, {</span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>      <span class="fu">compare_chains</span>(</span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a>        <span class="fu">sample</span>(chain_ss, <span class="at">size =</span> n, <span class="at">replace =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a>        <span class="fu">sample</span>(chain_uni, <span class="at">size =</span> n, <span class="at">replace =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a>      )<span class="sc">$</span><span class="st">`</span><span class="at">Pr(&gt;F)</span><span class="st">`</span>[<span class="dv">1</span>]</span>
+<span id="cb21-9"><a href="#cb21-9" aria-hidden="true" tabindex="-1"></a>    })</span>
+<span id="cb21-10"><a href="#cb21-10" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb21-11"><a href="#cb21-11" aria-hidden="true" tabindex="-1"></a>  })</span>
+<span id="cb21-12"><a href="#cb21-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">names</span>(results) <span class="ot">&lt;-</span> <span class="fu">paste</span>(<span class="st">"Sample Size:"</span>, sample_sizes)</span>
+<span id="cb21-13"><a href="#cb21-13" aria-hidden="true" tabindex="-1"></a>})</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>   user  system elapsed 
+  37.84    2.29   40.08 </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>results</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>$`Sample Size: 10`
+[1] 0.001
+
+$`Sample Size: 50`
+[1] 0.001
+
+$`Sample Size: 100`
+[1] 0.001
+
+$`Sample Size: 500`
+[1] 0.001</code></pre>
+</div>
+</div>
+</section>
+</section>
+</section>
+<section id="sensitivity-analysis" class="level1">
+<h1>Sensitivity Analysis</h1>
+<p>We now want to perform a sensitivity analysis on two posterior chains of transmission trees (<code>chain_A</code>, <code>chain_ss</code>) to investigate how the <strong>sample size</strong> (<code>sample_sizes</code>) and the <strong>proportion of overlap</strong> between the two chains (<code>overlap_freqs</code>) affect the performance of the test (<code>compare_chains</code>). See <code>run_analysis.R</code></p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(here<span class="sc">::</span><span class="fu">here</span>(<span class="st">"analysis"</span>, <span class="st">"run_analysis.R"</span>))</span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(run_analysis)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<ol type="1">
+<li><p>It first generates a grid of all possible combinations of <code>sample_sizes</code> and <code>overlap_freqs</code>.</p></li>
+<li><p>For each combination of parameters:</p>
+<ul>
+<li><p>Two samples are created:</p>
+<ul>
+<li><p><strong><code>reference</code></strong>: A sample of size <code>n</code> from <code>chainA</code> only.</p></li>
+<li><p><strong><code>mixed</code></strong>: A sample of size <code>n</code> combining <code>chainA</code> and <code>chainB</code>. It draws from <code>chainA</code> with probability <code>overlap_freq</code> and draws from <code>chainB</code> with probability 1-<code>overlap_freq</code> .</p></li>
+</ul></li>
+<li><p>The test compares <code>reference</code> with <code>mixed</code> and returns a p-value.</p></li>
+<li><p>This step is repeated <code>n_repeats</code> times.</p></li>
+</ul></li>
+<li><p>The function returns a 3D array:</p>
+<ul>
+<li>The rows represent the iteration id (<code>n_repeat</code>).</li>
+<li>The columns represent the <code>sample_size</code>.</li>
+<li>The 3rd dimension represent the overlapping frequency between the two chains (<code>overlap_freq</code>).</li>
+<li>The entries refer to the corresponding p-values.</li>
+</ul></li>
+</ol>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>result <span class="ot">&lt;-</span> <span class="fu">run_analysis</span>(</span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>    <span class="at">chainA =</span> chain_uni,</span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">chainB =</span> chain_ss,</span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">sample_sizes =</span> <span class="fu">c</span>(<span class="dv">50</span>, <span class="dv">200</span>, <span class="dv">1000</span>),</span>
+<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">overlap_freqs =</span> <span class="fu">seq</span>(<span class="dv">0</span>, <span class="dv">1</span>, <span class="fl">0.1</span>), <span class="co">#generate_sequence(0, 1, 0.1)</span></span>
+<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">n_repeats =</span> <span class="dv">1000</span></span>
+<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>We will be computing the following (note FPR = 1-sensitivity and FNR = 1-TPR) :</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 14%">
+<col style="width: 45%">
+<col style="width: 15%">
+<col style="width: 10%">
+<col style="width: 11%">
+</colgroup>
+<thead>
+<tr class="header">
+<th><strong>Metric</strong></th>
+<th><strong>Definition</strong></th>
+<th><p><strong><code>overlap_freq = 1</code></strong></p>
+<p><strong>(chains are identical)</strong></p></th>
+<th><p><strong><code>overlap_freq &lt; 1</code></strong></p>
+<p><strong>(partial overlap)</strong></p></th>
+<th><p><strong><code>overlap_freq = 0</code></strong></p>
+<p><strong>(chains are distinct)</strong></p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><p><strong>False Positive Rate (FPR)</strong></p>
+<p>(type I error)</p></td>
+<td>Proportion of tests incorrectly rejecting the null hypothesis (detecting a difference when there is none).</td>
+<td>Should be close to 5% (at α = 0.05)</td>
+<td>Unclear</td>
+<td>NA</td>
+</tr>
+<tr class="even">
+<td><p><strong>True Positive Rate (TPR)</strong></p>
+<p>(sensitivity)</p></td>
+<td>Proportion of tests correctly rejecting the null hypothesis (detecting a difference when there is one).</td>
+<td>NA</td>
+<td>Unclear</td>
+<td>Should be close to 100%</td>
+</tr>
+<tr class="odd">
+<td><p><strong>True Negative Rate (TNR)</strong></p>
+<p>(specificity)</p></td>
+<td>Proportion of tests correctly accepting the null hypothesis (detecting no difference when there is none).</td>
+<td>Should be 95%</td>
+<td>Unclear</td>
+<td>NA</td>
+</tr>
+<tr class="even">
+<td><p><strong>False Negative Rate (FNR)</strong></p>
+<p>(type II error)</p></td>
+<td>Proportion of tests incorrectly accepting the null hypothesis (detecting no difference when there is one).</td>
+<td>NA</td>
+<td>Unclear</td>
+<td>Should be close to 0%</td>
+</tr>
+<tr class="odd">
+<td><strong>Accuracy</strong></td>
+<td>Proportion of correct results (true positives + true negatives).</td>
+<td>Close to 95%</td>
+<td>Unclear</td>
+<td>Should be close to 100%</td>
+</tr>
+<tr class="even">
+<td><strong>Optimal Sample Size / Power</strong></td>
+<td>Minimum <code>n</code> needed to achieve desired TPR</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p>ROC Curve</p>
+<ol type="1">
+<li><p>For each combination of <code>sample_size</code> and <code>overlap_freq</code>, calculate the TPR and FPR across the <code>n_repeats</code> iterations.</p></li>
+<li><p>Plot multiple ROC curves where:</p>
+<ul>
+<li><p>Facet panel represent significance level</p></li>
+<li><p>x-axis represents FPR</p></li>
+<li><p>y-axis represents TPR</p></li>
+<li><p>A curve refers to a given <code>overlap_freq</code></p></li>
+<li><p>Points on the curve refer to <code>sample_sizes</code></p></li>
+</ul></li>
+</ol>
+<p>The goal will be:</p>
+<ul>
+<li><p>Compare test performance across different sample sizes</p></li>
+<li><p>Evaluate how the discrimination ability changes with overlap_freq</p></li>
+<li><p>Identify optimal significance level for balancing sensitivity and specificity</p></li>
+</ul>
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const onCopySuccess = function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
+  });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp('/' + window.location.host + '/');
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

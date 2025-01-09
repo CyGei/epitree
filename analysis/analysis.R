@@ -1,17 +1,14 @@
-pacman::p_load_gh("reconhub/simulacr")
-
-
-
 #################################################################
 dir.create(path = paste0("analysis/data/", Sys.Date()),
            showWarnings = FALSE)
 system.time({
   # simulation for type 2 error
   result <- run_analysis(
-    chainA = trees[[1]],
-    chainB = trees[[2]],
+    chainA = chain_uni,
+    chainB = chain_ss,
     sample_sizes = c(50, 200, 1000),
-    overlap_indexes = seq(0, 1, 0.1) #generate_sequence(0, 1, 0.1)
+    overlap_freqs = seq(0, 1, 0.1), #generate_sequence(0, 1, 0.1)
+    n_repeats = 1000
   )
   saveRDS(result, file = paste0("analysis/data/", Sys.Date(), "/result.rds"))
 }) -> time
