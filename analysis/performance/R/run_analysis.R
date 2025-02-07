@@ -3,10 +3,9 @@
 #' is affected by the sample size and the proportion of common trees in both chains.
 #' @param chainA A vector representing the first chain.
 #' @param chainB A vector representing the second chain.
-#' @param sample_sizes A sequence of sample sizes to test. Default is \code{seq(10, 1000, by = 200)}.
+#' @param sample_sizes A sequence of sample sizes to test. Default is \code{c(10, 50, 100, 500)}.
 #' @param overlap_freqs A sequence of overlap proportions to test. Default is \code{seq(0, 1, by = 0.2)}.
 #' @param n_repeats The number of repetitions to calculate the p-value. Default is 100.
-#' @param method The method to use for the comparison. Default is \code{"permanova"}. Alternative is \code{"get_chisq"}.
 #' @param n_cores The number of cores to use for parallel processing. Default is \code{future::availableCores() - 2}.
 #' @param seed A seed for reproducibility. Default is 123.
 #' @return A data frame with sample sizes, overlap indexes, and their corresponding p-values.
@@ -14,10 +13,9 @@
 
 run_analysis <- function(chainA,
                          chainB,
-                         sample_sizes = seq(10, 1000, by = 200),
+                         sample_sizes = c(10, 50, 100, 500),
                          overlap_freqs = seq(0, 1, by = 0.2),
                          n_repeats = 100,
-                         method = "permanova",
                          n_cores = future::availableCores() - 2,
                          seed = 123) {
   # Parameter grid
@@ -28,34 +26,33 @@ run_analysis <- function(chainA,
     pA <- params$overlap_freq
     pB <- 1 - pA
 
-    # Probabilities
     lenA <- length(chainA)
     lenB <- length(chainB)
-    probs <- rep(c(pA, pB), times = c(lenA, lenB))
-    probs <- probs / sum(probs)
+    total_chain <- c(chainA, chainB)
 
-    replicate(n_repeats, {
-      # Generate samples
-      mixed <- sample(
-        x = c(chainA, chainB),
-        size = n,
-        prob = probs,
-        replace = TRUE
-      )
+    # Probabilities
+    probs <- c(rep(pA / lenA, lenA), rep(pB / lenB, lenB))
 
-      reference <- sample(x = chainA,
-                          size = n,
-                          replace = TRUE)
+    # Pre-sample all at once
+    mixed_samples <- replicate(n_repeats, sample(
+      x = total_chain,
+      size = n,
+      prob = probs,
+      replace = TRUE
+    ), simplify = FALSE)
 
-      if (method == "permanova") {
-        suppressWarnings(epitree::compare_chains(reference, mixed)[, "Pr(>F)"][1])
-      } else if (method == "get_chisq") {
-        suppressWarnings(epitree::get_chisq(reference, mixed)$p.value)
-      } else {
-        stop("Method not recognised.")
-      }
+    reference_samples <- replicate(n_repeats, sample(
+      x = chainA,
+      size = n,
+      replace = TRUE
+    ), simplify = FALSE)
 
-    })
+    # Vectorize the test computation
+    p_values <- mapply(function(ref, mix) {
+      suppressWarnings(epitree::compare_chains(ref, mix)[, "Pr(>F)"][1])
+    }, reference_samples, mixed_samples)
+
+    return(p_values)
   }
 
   future::plan("future::multisession", workers = n_cores)

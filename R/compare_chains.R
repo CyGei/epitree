@@ -48,7 +48,7 @@ compare_chains <- function(...,
 
   # Validate each tree in master_chain (may remove)
   for (i in seq_along(master_chain)) {
-    check_tree(master_chain[[i]])
+    validate_tree(master_chain[[i]])
   }
 
   within_list <- lapply(master_chain, f_tree)

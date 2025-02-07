@@ -8,7 +8,7 @@ trees <- data %>%
   filter(Size >= 30) %>%
   .[["tree"]] %>%
   lapply(., \(g) igraph::upgrade_graph(g) |> igraph::as_long_data_frame() |> select(from, to))
-invisible(lapply(trees, check_tree))
+invisible(lapply(trees, validate_tree))
 sapply(trees, nrow) |> DescTools::Mode()
 
 N <- length(trees)

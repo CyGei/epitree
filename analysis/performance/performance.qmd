@@ -11,422 +11,328 @@ execute:
 
 ```{r, message=FALSE, warning=FALSE}
 pacman::p_load(outbreaker2, ape, igraph, vegan, distcrete, tidyverse, scales)
-pacman::p_load_gh("CyGei/o2ools")
+pacman::p_load_gh("CyGei/simulacr")
+pacman::p_load_gh("CyGei/o2ools") # helper functions for outbreaker2
 devtools::load_all()
 
 ```
 
-# Type I error (False Positive)
+# Helper functions
 
-A Type I error, or false positive, occurs when the null hypothesis is rejected despite being true. In this context, it means concluding that two (or more) posterior chains differ when they are, in fact, identical.
+-   `label_ids()` reassigns the identifiers in the specified id columns of a data frame to new sequential labels ordered by the date column.
 
-We run `outbreaker2` to produce a single posterior chain. We then create two (or more) bootstrapped samples by sampling with replacement from the same posterior chain and apply a statistical test to compare them. The test should yield a non-significant result (p-value \> 0.05) to correctly suggest no difference.
-
-## Running *outbreaker2*
-
-```{r}
-set.seed(111)
-x <- outbreaker(
-  data = outbreaker_data(
-    dna = fake_outbreak$dna,
-    dates = fake_outbreak$sample,
-    ctd = fake_outbreak$ctd,
-    w_dens = fake_outbreak$w,
-    ids = as.character(1:30)
-  ),
-  config = create_config(
-    init_pi = 1,
-    move_pi = FALSE,
-    find_import = FALSE
-  )
-)
-x <- x[x$step > 1000, ] # burnin
-
-chain <- o2ools::get_trees(out = x, ids =  as.character(1:30))
-
-
-#Function to remove the introduction in each tree of the chain (e.g. NA->1)
-prep_chain <- function(chain) {
-  clean <- lapply(chain, function(x) {
-    total_nas <- sum(is.na(x))
-    from_nas <- sum(is.na(x$from))
-    if (total_nas == 1 && from_nas == 1) {
-      x <- x[!is.na(x$from), ]
-      x[] <- lapply(x, as.character)
-      return(x)
-    } else {
-      stop("DataFrame must have exactly one NA, and it must be in the 'from' column")
+    ```{r}
+    label_ids <- function(id, date) {
+      ordered_ids <- id[order(date)]
+      new_labels <- as.character(seq_along(ordered_ids))
+      setNames(new_labels, ordered_ids)[id]
     }
-  })
-  return(clean)
-}
 
-chain <- prep_chain(chain)
-invisible(lapply(chain, check_tree)) # checks that the trees are in the right format
-```
+    relabel_tree <- function(df, id_cols, date_col = "date_onset") {
+      ids <- label_ids(df[[id_cols[1]]], df[[date_col]]) # Use the first column for labelling
 
-## Chi-square test
+      # Apply the relabelling all specified id columns
+      for (col in id_cols) {
+    df[[col]] <- ids[df[[col]]]
+      }
 
-The chi-square test is performed 1000 times, with new samples drawn for each iteration. Under the null hypothesis, we expect around 5% of the tests to yield a p-value \< 0.05 due to random chance.
+      df
+    }
+    ```
 
-For example:
+-   `*_epicontacts` converts transmission trees to `epicontacts` objects.
 
-```{r}
-set.seed(111)
-lambda <- 20
-t <- replicate(1000, {
-  x <- rpois(n = 10, lambda)
-  y <- rpois(n = 10, lambda)
-  chisq.test(cbind(x, y))$p.value
-})
-mean(t < 0.05) # Should be close to 0.05
-hist(t) # Should look roughly uniform
+    ```{r}
+    make_epicontacts <- function(tree) {
+      epicontacts::make_epicontacts(
+    linelist = subset(tree, select = -source),
+    contacts = subset(tree, select = c(source, id)),
+    na_rm_contacts = TRUE,
+    directed = TRUE
+      )
+    }
 
-```
+    plot_epicontacts <- function(epicontacts, x_axis = "date_onset") {
+      plot(epicontacts, x_axis = x_axis)
+    }
+    ```
 
-Note that when $\lambda$ is small (*e.g.* when a cell in the contingency table has a value \<5), Fisher's exact test should be used instead. This is particularly relevant when comparing posterior chains, as it is possible for a pair, such as A-\>B, to appear a few times in one chain but never (0) in the other.
+# Convergence test
 
-To assess the sensitivity of the test to sample size, we vary the number of trees sampled from the posterior distribution (`chain`) in each replication.
+> Do independent MCMC chains of `outbreaker2` converge to the same posterior distribution of transmission trees?
 
-```{r, message = FALSE, warning = FALSE}
-sample_sizes <- c(10, 50, 100, 500)
-set.seed(111)
-results <- lapply(sample_sizes, function(n) {
-  test <- replicate(100, {
-    get_chisq(
-      sample(chain, size = n, replace = TRUE),
-      sample(chain, size = n, replace = TRUE)
-      #test_args = list(simulate.p.value = TRUE, B = 1000)
-    )$p.value
-  })
-})
+## Purpose
 
-lapply(results, function(p_vals){
-  mean(p_vals < 0.05) # Shlould be close to 0.05
-})
+This section validates the convergence of outbreak reconstruction using `outbreaker2`. We assess whether independent MCMC chains yield statistically similar posterior distributions of transmission trees. If `outbreaker2` has properly converged, differences between chains should be non-significant (p-value \> 0.05).
 
-```
+## Null Hypothesis
 
-We don't observe the expected 5% of false positives likely because the chi-square test is used with low frequencies. Fisher's test is computationally intensive, so we won't try it out here but you can specify `method = "fisher"` in the function `epitree::get_chisq()`.
+The MCMC samples stem from same posterior distribution of transmission trees.
 
-## PERMANOVA
+### Methodology
 
-Same methodology, using `vegan::adonis2()`. However, we only use 1 replicate as it takes a long time to run
+1.  **Simulate an outbreak**
+    -   A synthetic transmission tree is generated using `simulacr::simulate_outbreak`\#
+2.  **Reconstruct the outbreak, twice (two MCMC chains)**
+    -   The same input data is used to generate two independent MCMC chains using `outbreaker2`.
+    -   Each chain runs with a different random seed.
+    -   We assess the quality of the reconstructed outbreaks and ensure sufficient accuracy / low entropy.
+3.  **Compare chains**
+    -   Apply `compare_chains` using PERMANOVA (`adonis2`) to test for statistical differences.
+    -   If `outbreaker2` has converged, the test should be non-significant (p-value \> 0.05).
 
-```{r, warning=FALSE}
-sample_sizes <- c(10, 50, 100, 500)
-results <- lapply(sample_sizes, function(n) {
-  test <- replicate(1, {
-    compare_chains(sample(chain, size = n, replace = TRUE),
-                   sample(chain, size = n, replace = TRUE))$`Pr(>F)`[1]
-  })
-  
-})
-results
+### Code
 
-```
-
-# Type II error (False Negative)
-
-A Type II error, or false negative, occurs when the null hypothesis is accepted despite being false. In this context, it means concluding that two (or more) posterior chains are identical when they are, in fact, different.
-
-To assess a Type II error, we require at least two distinct outbreak scenarios. For example, one scenario involving super-spreading (heterogeneous transmission) and another with no over-dispersion (homogeneous transmission) where all individuals have the same reproduction number $R$).
-
-The package `simulacr` will help us simulate such outbreaks.
-
-```{r, message=FALSE}
-pacman::p_load_gh("CyGei/simulacr")
-```
-
-## Super-spreading outbreak `chain_ss`
-
-### True transmission tree
-
-We specify an offspring distribution using `rnbinom(n = 100, size = 0.2, mu = 3)`, where the small dispersion parameter ($k$ or `size`), indicates high overdispersion. This results in heterogeneous transmission, with substantial variation in the number of secondary cases generated by each infector.
+#### True transmission tree
 
 ```{r}
-set.seed(111)
-sim_ss <- 
-  simulacr::simulate_outbreak(
+set.seed(123)
+sim <- simulacr::simulate_outbreak(
   duration = 100,
-  population_size = 20,
-  R_values = rnbinom(n = 100, size = 0.2, mu = 3), #size is k (dispersion parameter)
-  dist_incubation = fake_outbreak$w,
-  dist_generation_time = fake_outbreak$w
+  population_size = 100,
+  R_values = sample(1:3, size = 100, replace = TRUE),
+  dist_incubation = outbreaker2::fake_outbreak$w,
+  dist_generation_time = outbreaker2::fake_outbreak$w
 )$data
-epic_ss <- as_epicontacts(sim_ss)
-plot(epic_ss)
+sim <- relabel_tree(sim, id_cols = c("id", "source"), date_col = "date_onset")
+sim %>%
+  make_epicontacts() %>%
+  plot_epicontacts()
 ```
 
-### Outbreak reconstruction
+#### Outbreak reconstruction
 
-Let's use `sim_ss`'s data as input for `outbreaker2`. The resulting output we'll use is called `chain_ss`.
+##### Data & configuration
 
-```{r, message=FALSE, warning=FALSE}
-out_ss <- outbreaker(
-  data = outbreaker_data(
-    dates = sim_ss$date_onset,
-    ctd = epic_ss$contacts[-1, ],
-    w_dens = fake_outbreak$w,
-    ids = as.character(epic_ss$linelist$id)
-  ),
-  config = create_config(
+```{r}
+data <- outbreaker_data(
+  dates = sim$date_onset,
+  w_dens = outbreaker2::fake_outbreak$w,
+  f_dens = outbreaker2::fake_outbreak$w,
+  ctd = sim[2:5, c("source", "id")], #add some contacts to improve accuracy
+  ids = sim$id
+)
+config <- create_config(
+  init_pi = 1,
+  move_pi = FALSE,
+  find_import = FALSE
+)
+```
+
+##### `outbreaker2`
+
+```{r}
+set.seed(1)
+out1 <- outbreaker(
+  data = data,
+  config = config
+)
+
+set.seed(2)
+out2 <- outbreaker(
+  data = data,
+  config = config
+)
+```
+
+##### Assess reconstruction
+
+Code hidden for conciseness.
+
+```{r, include=FALSE}
+plot(out1)
+plot(out2)
+out1 <- out1[out1$step > 1000, ]
+out2 <- out2[out2$step > 1000, ]
+o2ools::get_entropy(out1)
+o2ools::get_entropy(out2)
+
+trees1 <- o2ools::get_trees(out1, data$ids)
+trees2 <- o2ools::get_trees(out2, data$ids)
+
+o2ools::get_accuracy(
+  est_tt = trees1,
+  true_tt = data.frame(from = sim$source, to = data$ids)
+) %>%
+  hist(breaks = seq(from = 0, to = 1, by = 0.1))
+o2ools::get_accuracy(
+  est_tt = trees2,
+  true_tt = data.frame(from = sim$source, to = data$ids)
+) %>%
+  hist(breaks = seq(from = 0, to = 1, by = 0.1))
+```
+
+#### `compare_chains`
+
+```{r}
+# Process tress for `compare_chains` (i.e. remove introductions)
+trees1 <- lapply(trees1, process_tree)
+trees2 <- lapply(trees2, process_tree)
+compare_chains(trees1, trees2)
+```
+
+#### More than 2 chains
+
+We can run as many independent chains as we like and feed them into `compare_chains`. The p-value should remain \> 0.05.
+
+```{r}
+trees <- lapply(1:5, function(i) {
+  #set.seed(i)
+  out <- outbreaker(data = data, config = config)
+  out <- out[out$step > 1000, ]
+  trees <- o2ools::get_trees(out, data$ids)
+  trees <- lapply(trees, process_tree)
+})
+do.call(compare_chains, trees)
+```
+
+# Common epi characteristics
+
+> Does the test "correctly" fail to detect a significant difference when applied to outbreaks with identical epidemiological characteristics?
+
+## Purpose
+
+This section evaluates whether the test "correctly" detects no significant difference when applied to two outbreaks generated from identical epidemiological characteristics.
+
+## Null Hypothesis
+
+The (two or more!) MCMC chains come from transmission trees generated with the same parameters.
+
+### Methodology
+
+1.  **Simulate two outbreaks**
+    -   Two synthetic transmission trees generated with `simulacr::simulate_outbreak` using identical epidemiological parameters.
+2.  **Reconstruct the outbreaks**
+    -   We reconstruct each outbreak with `outbreaker2`.
+    -   Assess reconstruction quality by ensuring sufficient accuracy and low entropy.
+3.  **Compare chains**
+    -   Apply `compare_chains` between the two posterior distributions of transmission trees.
+    -   Since both outbreaks share the same epidemiological characteristics (e.g., case counts, offspring distribution, generation time), no significant difference should be detected if the test performs correctly.
+
+### Code
+
+Note that even with the same parameters, the number of cases may vary. We ensure that we always end up with 18 cases in the below.
+
+#### Oubtreak simulation
+
+```{r}
+n_iter <- 2
+sims <- lapply(seq_len(n_iter), function(i) {
+  set.seed(i)
+  repeat {
+    sim <- simulacr::simulate_outbreak(
+      duration = 100,
+      population_size = 20,
+      R_values = sample(1:3, size = 100, replace = TRUE),
+      dist_incubation = outbreaker2::fake_outbreak$w,
+      dist_generation_time = outbreaker2::fake_outbreak$w
+    )$data
+    if (nrow(sim) == 18) break # Keep sim only if it reaches 18 cases
+  }
+  sim <- relabel_tree(sim,
+    id_cols = c("id", "source"),
+    date_col = "date_onset"
+  )
+})
+```
+
+#### Oubtreak reconstruction
+
+```{r}
+perc_ctd <- 0.6 # take X% of ctd data to improve reconstruction
+
+trees <- lapply(seq_len(n_iter), function(i) {
+  sim <- sims[[i]]
+
+  # sample from ctd data
+  n_ctd <- round(nrow(sim) * perc_ctd)
+  ctd_indices <- sample(x = 2:nrow(sim), size = n_ctd, replace = FALSE)
+
+  data <- outbreaker_data(
+    dates = sim$date_onset,
+    w_dens = outbreaker2::fake_outbreak$w,
+    f_dens = outbreaker2::fake_outbreak$w,
+    ctd = sim[ctd_indices, c("source", "id")],
+    ids = sim$id
+  )
+  config <- create_config(
     init_pi = 1,
     move_pi = FALSE,
     find_import = FALSE
+    # ctd_directed = TRUE
   )
-)
-plot(out_ss)
-out_ss <- out_ss[out_ss$step > 1000, ] # burnin
-plot(out_ss, type = "network")
-
-chain <- get_trees(out = out_ss, ids = as.character(epic_ss$linelist$id))
-chain_ss <- prep_chain(chain)
-invisible(lapply(chain_ss, check_tree))
-
-```
-
-Check that `outbreaker2` did a good job by computing the proportion of correctly assigned ancestries.
-
-```{r}
-o2ools::get_accuracy(chain_ss, epic_ss$contacts[-1, ]) %>% 
-  hist(
-    main = "Accuracy of outbreak reconstruction",
-    xlab = "% of correctly inferred ancestries",
-    ylab = "Count"
-  )
-
-```
-
-## "Uniform" outbreak
-
-### True transmission tree
-
-Here we provide the same reproduction number $R$ for everyone. For fair comparison, I ran a separate script to find a random seed that yields the same number of cases as `out_ss` and we'll assign randomly the case IDs from `out_ss` to the below. The resulting output we'll use is called `chain_uni`.
-
-```{r}
-set.seed(3961)
-sim_uni <- 
-  simulacr::simulate_outbreak(
-  duration = 100,
-  population_size = 20,
-  R_values = 1L,
-  dist_incubation = fake_outbreak$w,
-  dist_generation_time = fake_outbreak$w
-)$data
-epic_uni <- as_epicontacts(sim_uni)
-plot(epic_uni)
-```
-
-@Thibaut `R_values` is not respected (some cases have R=2). Is this normal?
-
-### Outbreak reconstruction
-
-Let's use `sim_uni`'s data as input for `outbreaker2`.
-
-```{r, message=FALSE, warning=FALSE}
-out_uni <- outbreaker(
-  data = outbreaker_data(
-    dates = sim_uni$date_onset,
-    ctd = epic_uni$contacts[-1, ],
-    w_dens = fake_outbreak$w,
-    ids = as.character(epic_uni$linelist$id)
-  ),
-  config = create_config(
-    init_pi = 1,
-    move_pi = FALSE,
-    find_import = FALSE
-  )
-)
-plot(out_uni)
-out_uni <- out_uni[out_uni$step > 1000, ] # burnin
-plot(out_uni, type = "network")
-
-# assign the IDs from sim_ss
-common_ids <- sample(as.character(epic_ss$linelist$id))
-chain <- get_trees(out = out_uni, ids = common_ids)
-chain_uni <- prep_chain(chain)
-invisible(lapply(chain_uni, check_tree))
-
-```
-
-## Comparing two distinct posterior chains
-
-`chain_ss` refer to the superspreading outbreak and `chain_uni` to the "uniform" outbreak.
-
-### Chi-square test
-
-```{r, message=FALSE, warning=FALSE}
-sample_sizes <- c(10, 50, 100, 500)
-set.seed(111)
-results <- lapply(sample_sizes, function(n) {
-  test <- replicate(100, {
-    get_chisq(
-      sample(chain_ss, size = n, replace = TRUE),
-      sample(chain_uni, size = n, replace = TRUE)
-      #test_args = list(simulate.p.value = TRUE, B = 1000)
-    )$p.value
-  })
-  
-  return(mean(test < 0.05))
+  set.seed(i)
+  out <- outbreaker(data = data, config = config)
+  out <- out[out$step > 1000, ]
+  trees <- o2ools::get_trees(out, data$ids)
+  trees <- lapply(trees, process_tree)
 })
-
-names(results) <- paste("Sample Size:", sample_sizes)
-
-results
 ```
-
-### PERMANOVA
-
-We only replicate the test once due to running time.
-
-```{r, warning=FALSE}
-sample_sizes <- c(10, 50, 100, 500)
-system.time({
-  results <- lapply(sample_sizes, function(n) {
-    test <- replicate(1, {
-      compare_chains(
-        sample(chain_ss, size = n, replace = TRUE),
-        sample(chain_uni, size = n, replace = TRUE)
-      )$`Pr(>F)`[1]
-    })
-    
-  })
-  names(results) <- paste("Sample Size:", sample_sizes)
-})
-
-results
-
-```
-
-# Sensitivity Analysis
-
-We now want to perform a sensitivity analysis on two posterior chains of transmission trees (`chain_A`, `chain_B`) to investigate how the **sample size** (`sample_sizes`) and the **proportion of overlap** between the two chains (`overlap_freqs`) affect the performance of the test (`compare_chains`). See `run_analysis.R`
-
-```{r, eval=FALSE}
-source(here::here("analysis/performance/R", "run_analysis.R"))
-print(run_analysis)
-```
-
-1.  It first generates a grid of all possible combinations of `sample_sizes` and `overlap_freqs`.
-
-2.  For each combination of parameters:
-
-    -   Two samples are created:
-
-        -   **`reference`**: A sample of size `n` from `chainA` only.
-
-        -   **`mixed`**: A sample of size `n` combining `chainA` and `chainB`. It draws from `chainA` with probability `overlap_freq` and draws from `chainB` with probability 1-`overlap_freq` .
-
-    -   The test compares `reference` with `mixed` and returns a p-value.
-
-    -   This step is repeated `n_repeats` times.
-
-3.  The function returns a 3D array:
-
-    -   The rows represent the iteration id (`n_repeat`).
-    -   The columns represent the `sample_size`.
-    -   The 3rd dimension represent the overlapping frequency between the two chains (`overlap_freq`).
-    -   The entries refer to the corresponding p-values.
-
-```{r, eval=FALSE}
-result <- run_analysis(
-    chainA = chain_uni,
-    chainB = chain_ss,
-    sample_sizes = c(50, 200, 1000),
-    overlap_freqs = seq(0, 1, 0.1), #generate_sequence(0, 1, 0.1)
-    n_repeats = 1000
-  )
-# Took 51 hours to run!!!!! @Thibaut
-```
-
-Let's read the results from the simulation.
 
 ```{r}
-run_date <- "2025-01-08"
-result <- readRDS(here::here("analysis/performance/data", run_date, "/result.rds")) %>% reshape2::melt()
-str(result)
+do.call(compare_chains, trees)
 ```
 
-```{r, echo=FALSE}
-pacman::p_load(gghalves, ggh4x)
-p_dist <- result %>%
-  mutate(title = "Sample Size") %>%
-  ggplot(aes(
-    y = value,
-    x = overlap_freq,
-    group = interaction(sample_size, overlap_freq, title),
-  )) +
-  ggh4x::facet_nested(~ title + sample_size, scales = "free", space = "free") +
-  gghalves::geom_half_violin(
-    scale = "width",
-    fill = "grey",
-    color = "black",
-    alpha = 0.5,
-    draw_quantiles = c(0.05, 1 - 0.05),
-    side = "r",
-    nudge = 0.025
-  ) +
-  gghalves::geom_half_boxplot(side = "l",
-                              outlier.size = 0.1,
-                              nudge = 0.025) +
-  #stat_binline(bins = 50, scale = 0.9, draw_baseline = FALSE)+
-  geom_hline(yintercept = 0.05,
-             linetype = "dashed",
-             colour = "orange") +
-  coord_flip() +
-  theme_bw() +
-  theme(
-    legend.position = "bottom",
-    strip.background = element_rect(
-      fill = "white",
-      colour = "black",
-      size = 0.5
-    ),
-    strip.text.x = element_text(face = "bold")
-  ) +
-  labs(x = "Overlap Frequency", y = "p-value", title = "Distribution of p-values by Sample Size and Overlap Frequency")
+# Next step
 
-p_dist
+We perform a sensitivity analysis on two posterior chains of transmission trees (`chain_A`, `chain_B`) to investigate how the **sample size** (`sample_sizes`), the epidemic size (`epidemic_sizes`) and the **proportion of overlap** between the two chains (`overlap_freqs`) affect the performance of the test (`compare_chains`). See `run_analysis.R`
+
+```{r}
+sample_sizes <- c(10, 50, 100, 500)
+overlap_freqs <- seq(0, 1, by = 0.2)
+epidemic_sizes <- c(20, 100, 200)
+results <- readRDS("~/PROJECTS_LOCAL/epitree/analysis/performance/data/2025-02-03/results.rds")
 ```
 
-The plot shows the distribution of p-values comparing two chains of posterior transmission trees over 1000 iterations.
 
--   With 50 trees per chain, the test detects a significant difference unless over 70% of the samples are from a shared distribution.
 
--   For chains with 200 trees, this threshold rises to 90%.
+```{r}
+library(tidyverse, ggplot2, ggh4x)
+df <- lapply(seq_along(results), function(i) {
+  as.data.frame.table(results[[i]]) %>%
+    mutate(epidemic_size = epidemic_sizes[i])
+}) %>%
+  bind_rows() %>%
+  mutate(epidemic_size = factor(epidemic_size, levels = epidemic_sizes)) %>%
+  rename(p_value = Freq)
 
--   For 1000 trees, the test accepts the null hypothesis of no difference only when the chains are entirely drawn from the same posterior distribution.
-
-**Overall, as sample size increases, the test becomes more sensitive to differences between the chains, requiring a higher proportion of shared samples to accept the null hypothesis of no difference.**
-
-Alternatively, we can look at the frequency of p-values that are \< and $\ge$ to 0.05. Again, we expect on average 5% of false positives for two identical chains.
-
-```{r, echo=FALSE, message=FALSE}
-annotations <- result %>%
-  group_by(sample_size, overlap_freq) %>%
-  summarise(below_0.05 = mean(value < 0.05) * 100,
-            above_0.05 = mean(value >= 0.05) * 100) %>%
+alpha <- 0.05
+annotations_df <- df %>%
+  group_by(epidemic_size, sample_size, overlap_freq) %>%
+  summarise(reject = mean(p_value < alpha) * 100,
+            accept = mean(p_value >= alpha) * 100,
+            .groups = "drop") %>%
   pivot_longer(
-    cols = c("below_0.05", "above_0.05"),
+    cols = c("reject", "accept"),
     names_to = "category",
     values_to = "percentage"
   ) %>%
-  mutate(title = "Sample Size")
+  mutate(
+    row_title = "Epidemic Size",
+    col_title = "Posterior Sample Size")
+
+str(annotations_df)
 
 
-p_props <- ggplot(annotations, aes(
-  x = percentage,
-  y = factor(overlap_freq),
-  fill = category
-)) +
-  ggh4x::facet_nested(~ title + sample_size, scales = "free", space = "free") +
+p_props <- annotations_df %>%
+  ggplot() +
+  aes(x = percentage,
+      y = factor(overlap_freq),
+      fill = category) +
+  ggh4x::facet_nested(
+    rows = vars(row_title, epidemic_size),
+    cols = vars(col_title, sample_size),
+    scales = "fixed",
+    space = "fixed",
+    remove_labels = "none",
+    nest_line = element_line(colour = "grey")
+  )+
   geom_bar(stat = "identity",
            position = "stack",
            width = 0.7) +
   geom_text(
     aes(
-      x = ifelse(category == "below_0.05", percentage / 2, 100 - percentage / 2),
+      x = ifelse(category == "reject", percentage / 2, 100 - percentage / 2),
       label = ifelse(percentage > 0, round(percentage, 1), "")
     ),
     position = position_stack(vjust = 0.5),
@@ -436,12 +342,12 @@ p_props <- ggplot(annotations, aes(
   scale_fill_manual(
     values =
       c(
-        "below_0.05" = "#FAD2CF",
-        "above_0.05" = "#CEEAD6"
+        "reject" = "#FAD2CF",
+        "accept" = "#CEEAD6"
       ),
-    breaks = c("below_0.05", "above_0.05"),
+    breaks = c("reject", "accept"),
     name = "P-value",
-    labels = c("below_0.05" = "Reject Null", "above_0.05" = "Accept Null")
+    labels = c("reject" = "Reject Null", "accept" = "Accept Null")
   ) +
   coord_cartesian(xlim = c(0, 100)) +
   theme_bw() +
@@ -450,144 +356,78 @@ p_props <- ggplot(annotations, aes(
     strip.background = element_rect(
       fill = "white",
       colour = "black",
-      size = 0.5
+      linewidth = 0.5
     ),
-    strip.text.x = element_text(face = "bold")
+    strip.text = element_text(family = "Fira Code",
+                              #face = "bold",
+                              size = 10),
+    plot.title = element_text(size=12)
   ) +
-  labs(x = "Percentage", y = "Overlap Frequency", title = "Percentage of p-values below and above 0.05 by Sample Size and Overlap Frequency")
+  labs(x = "Percentage",
+       y = "Overlap Frequency",
+       title = "Proportion of p-values </> 0.05 by Overlap Frequency, Sample Size, and Epidemic Size")
 p_props
 
-```
+#############################
+# Test results
+#############################
+library(broom)
+model_df <- df %>%
+  mutate(
+    category = ifelse(p_value < alpha, "reject", "accept"),
+    reject = ifelse(p_value < alpha, 1, 0),
+    accept = ifelse(p_value >= alpha, 1, 0),
+  ) %>%
+  select(epidemic_size,
+         sample_size,
+         overlap_freq,
+         category,
+         reject,
+         accept)
+#############################
+# Chi-square test
+#############################
 
-```{r, echo=FALSE, message=FALSE}
-binom_ci <- function(x, n, conf.level = 0.95) {
-  ci <- binom.test(x = round(x * n), n = n, conf.level = conf.level)$conf.int
-  return(list(lower = ci[1], upper = ci[2]))
-}
+chisq.test(table(model_df$category, model_df$epidemic_size))
+chisq.test(table(model_df$category, model_df$sample_size))
 
-performance <- result %>% 
-  group_by(sample_size, overlap_freq) %>% 
-  summarise(
-    n_tests = n(),  # total number of tests
-    reject_rate = mean(value < 0.05),
-    ci = list(binom_ci(reject_rate, n_tests)),
-    lwr = ci[[1]]$lower,
-    upr = ci[[1]]$upper,
-    .groups = 'drop'
-  ) %>% 
-  mutate(title = "Sample Size")
+#############################
+# Logistic regression
+#############################
+# The logistic regression model is used to determine the effect of
+# the overlap frequency and sample size on the probability of rejecting the null hypothesis.
 
-ggplot(performance, aes(x = overlap_freq, y = reject_rate)) +
-   ggh4x::facet_nested(~ title + sample_size) +
-  geom_line(linewidth = 0.3) +
+
+glm(
+  reject ~ sample_size,
+  data = model_df,
+  family = binomial(link = "logit")
+) %>%
+  broom::tidy() %>%
+  mutate(OR = exp(estimate))
+
+m1 <- glm(
+  reject ~ sample_size + epidemic_size + as.numeric(as.character(overlap_freq)),
+  data = model_df,
+  family = binomial(link = "logit")
+) %>%
+  broom::tidy() %>%
+  mutate(
+    OR = exp(estimate),
+    lower_ci = exp(estimate - 1.96 * std.error),
+    upper_ci = exp(estimate + 1.96 * std.error)
+  ) %>%
+  filter(term != "(Intercept)")
+
+ggplot(m1, aes(y = term, x = OR)) +
   geom_point() +
-  geom_errorbar(aes(ymin =lwr, ymax = upr), width = 0.05) +
-  geom_hline(yintercept = 0.05, linetype = "dashed", color = "black") +
-  theme_bw() +
-  theme(
-    legend.position = "bottom",
-    strip.background = element_rect(
-      fill = "white",
-      colour = "black",
-      size = 0.5
-    ),
-    strip.text.x = element_text(face = "bold")
-  ) +
-  labs(
-    title = "Rejection rate by overlap frequency & sample size",
-    x = "Overlap Frequency",
-    y = "Rejection Rate (proportion p < 0.05)") 
-```
-
-# TO DISCUSS
-
-We will be computing the following (note FPR = 1-sensitivity and FNR = 1-TPR) :
-
-+---------------------------------+------------------------------------------------------------------------------------------------------------+-------------------------------------+------------------------+---------------------------+
-| **Metric**                      | **Definition**                                                                                             | **`overlap_freq = 1`**              | **`overlap_freq < 1`** | **`overlap_freq = 0`**    |
-|                                 |                                                                                                            |                                     |                        |                           |
-|                                 |                                                                                                            | **(chains are identical)**          | **(partial overlap)**  | **(chains are distinct)** |
-+=================================+============================================================================================================+=====================================+========================+===========================+
-| **False Positive Rate (FPR)**   | Proportion of tests incorrectly rejecting the null hypothesis (detecting a difference when there is none). | Should be close to 5% (at α = 0.05) | Unclear                | NA                        |
-|                                 |                                                                                                            |                                     |                        |                           |
-| (type I error)                  |                                                                                                            |                                     |                        |                           |
-+---------------------------------+------------------------------------------------------------------------------------------------------------+-------------------------------------+------------------------+---------------------------+
-| **True Positive Rate (TPR)**    | Proportion of tests correctly rejecting the null hypothesis (detecting a difference when there is one).    | NA                                  | Unclear                | Should be close to 100%   |
-|                                 |                                                                                                            |                                     |                        |                           |
-| (sensitivity)                   |                                                                                                            |                                     |                        |                           |
-+---------------------------------+------------------------------------------------------------------------------------------------------------+-------------------------------------+------------------------+---------------------------+
-| **True Negative Rate (TNR)**    | Proportion of tests correctly accepting the null hypothesis (detecting no difference when there is none).  | Should be 95%                       | Unclear                | NA                        |
-|                                 |                                                                                                            |                                     |                        |                           |
-| (specificity)                   |                                                                                                            |                                     |                        |                           |
-+---------------------------------+------------------------------------------------------------------------------------------------------------+-------------------------------------+------------------------+---------------------------+
-| **False Negative Rate (FNR)**   | Proportion of tests incorrectly accepting the null hypothesis (detecting no difference when there is one). | NA                                  | Unclear                | Should be close to 0%     |
-|                                 |                                                                                                            |                                     |                        |                           |
-| (type II error)                 |                                                                                                            |                                     |                        |                           |
-+---------------------------------+------------------------------------------------------------------------------------------------------------+-------------------------------------+------------------------+---------------------------+
-| **Accuracy**                    | Proportion of correct results (true positives + true negatives).                                           | Close to 95%                        | Unclear                | Should be close to 100%   |
-+---------------------------------+------------------------------------------------------------------------------------------------------------+-------------------------------------+------------------------+---------------------------+
-| **Optimal Sample Size / Power** | Minimum `n` needed to achieve desired TPR                                                                  |                                     |                        |                           |
-+---------------------------------+------------------------------------------------------------------------------------------------------------+-------------------------------------+------------------------+---------------------------+
-
-The goal is to:
-
--   Compare test performance across different sample sizes
-
--   Evaluate how the "discrimination" ability changes with overlap_freq
-
--   Identify optimal significance level for balancing sensitivity and specificity
-
-## ROC
-
--   Consider overlap_freq = 0 as our "positive" case (chains are truly different)
-
-<!-- -->
-
--   Consider overlap_freq = 1 as our "negative" case (chains are identical)
-
-```{r, echo=FALSE, message=FALSE}
-# Calculate TPR and FPR for more threshold points
-alphas <- seq(0, 1, by = 0.01)  # More points for smoother curves
-roc_points <- lapply(alphas, function(alpha) {
-  fpr <- result %>%
-    filter(overlap_freq == 1) %>%
-    group_by(sample_size) %>%
-    summarise(FPR = mean(value < alpha), .groups = "drop")
-  tpr <- result %>%
-    filter(overlap_freq == 0) %>%
-    group_by(sample_size) %>%
-    summarise(TPR = mean(value < alpha), .groups = "drop")
-  data.frame(FPR = fpr$FPR, TPR = tpr$TPR, 
-             sample_size = fpr$sample_size, threshold = alpha)
-}) %>% bind_rows()
-
-ggplot(roc_points,
-       aes(
-         x = FPR,
-         y = TPR,
-         color = as.factor(sample_size),
-         group = sample_size
-       )) +
-  geom_line() +
-  geom_point(data = roc_points %>% filter(threshold %in% c(0.05, 0.1, 0.5)),
-             aes(shape = factor(threshold)),
-             # Map shapes to the thresholds
-             size = 2) +
-  geom_abline(slope = 1,
-              intercept = 0,
-              linetype = "dashed") +
-  theme_bw() +
-  scale_y_continuous(limits = c(0, 1)) +
-  scale_x_continuous(limits = c(0, 1)) +
-  labs(
-    x = "False Positive Rate",
-    y = "True Positive Rate",
-    color = "Sample Size",
-    shape = "Example alpha",
-    title = "ROC curves by Sample Size"
-  ) +
-  scale_shape_manual(breaks = c("0.05", "0.1", "0.5"),
-                     values = c(18, 17, 15))
-
+  geom_errorbarh(aes(xmin = lower_ci, xmax = upper_ci),
+                 height = 0.2) +
+  geom_vline(xintercept = 1,
+             linetype = "dashed",
+             color = "red") +
+  scale_x_log10() +  # Log scale for better visualization of ORs
+  labs(title = "Odds Ratios with 95% Confidence Intervals", x = "Odds Ratio (log scale)", y = "Variable") +
+  theme_minimal()
 
 ```
