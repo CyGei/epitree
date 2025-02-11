@@ -7,7 +7,7 @@
 #' @param test_args Additional arguments passed to \code{\link[stats]{chisq.test}} or \code{\link[stats]{fisher.test}}. Must be a list.
 #' @return A list of class `htest` containing the test results.
 #'
-#' @importFrom stats xtabs chisq.test fisher.test
+#' @importFrom stats chisq.test fisher.test complete.cases
 #' @export
 
 get_chisq <- function(...,
@@ -31,7 +31,7 @@ get_chisq <- function(...,
   tab <- Reduce(function(x, y)
     merge(x, y, by = c("from", "to"), all = TRUE), tabs)
   freq_cols <- grep("Freq", colnames(tab))
-  tab <- tab[complete.cases(tab), ]
+  tab <- tab[stats::complete.cases(tab), ]
   tab <- tab[rowSums(tab[, freq_cols]) > 0, ]
 
   pairs <- paste(tab$from, tab$to, sep = "-")

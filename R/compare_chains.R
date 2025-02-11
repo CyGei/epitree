@@ -18,6 +18,7 @@
 #' @importFrom igraph graph_from_data_frame distances
 #' @importFrom vegan adonis2
 #' @importFrom stats as.dist
+#' @importFrom utils combn
 #' @export
 
 compare_chains <- function(...,
@@ -55,7 +56,7 @@ compare_chains <- function(...,
 
   # Get all unique pair combinations#
   n <- length(master_chain)
-  pairs <- t(combn(n, 2))
+  pairs <- t(utils::combn(n, 2))
   d <- matrix(0, n, n)
 
 
