@@ -1,0 +1,52 @@
+---
+output: github_document
+---
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "man/figures/README-",
+  out.width = "100%"
+)
+```
+
+# epitree
+
+<!-- badges: start -->
+<!-- badges: end -->
+
+The `epitree` package provides a statistical framework for comparing posterior distributions of transmission trees (*and soon*, phylogenetic trees) generated through Bayesian inference. It employs PERMANOVA (via [`vegan::adonis2`](https://vegandevs.github.io/vegan/reference/adonis.html)) to assess whether trees from different models or MCMC chains stem from the same underlying distribution.
+
+## Installation
+
+You can install the development version of epitree from [GitHub](https://github.com/) with:
+
+``` r
+# install.packages("pak")
+pak::pak("CyGei/epitree")
+```
+
+# Quick start
+
+```{r}
+library(epitree)
+
+# Simulate two chains of transmission trees
+chainA <- lapply(1:100, function(i) {
+  make_tree(20, R = 2, stochastic = TRUE) |>
+    igraph::as_long_data_frame()
+})
+chainB <- lapply(1:100, function(i) {
+  make_tree(20, R = 4, stochastic = TRUE) |>
+    igraph::as_long_data_frame()
+})
+
+# Compare the two chains
+result <- compare_chains(chainA, chainB)
+print(result)
+
+```
+

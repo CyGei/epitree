@@ -1,13 +1,19 @@
 Package: epitree
-Title: What the Package Does (One Line, Title Case)
+Title: Statistical Comparison of Transmission and Phylogenetic Tree Distributions
 Version: 0.0.0.9000
 Authors@R: 
     person("Cyril", "Geismar", , "c.geismar21@imperial.ac.uk", role = c("aut", "cre"),
            comment = c(ORCID = "YOUR-ORCID-ID"))
-Description: What the package does (one paragraph).
-License: `use_mit_license()`, `use_gpl3_license()` or friends to pick a
-    license
+Description: Implements statistical methods for comparing posterior distributions 
+    of transmission and phylogenetic trees using permutational multivariate 
+    analysis of variance (PERMANOVA).
+License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.2
 Imports: igraph, treespace, vegan
+Suggests: 
+    knitr,
+    rmarkdown
+VignetteBuilder: knitr
+URL: https://cygei.github.io/epitree/

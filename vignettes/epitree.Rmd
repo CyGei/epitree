@@ -1,0 +1,124 @@
+---
+title: "epitree"
+author: "Cyril Geismar"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{epitree}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(epitree)
+```
+
+# Introduction
+
+The `epitree` package provides a statistical framework for comparing posterior distributions of transmission trees (*and soon*, phylogenetic trees) generated through Bayesian inference.
+
+# Satistical Framework
+
+Bayesian reconstruction of transmission (or phylogenetic) trees yields posterior distributions that may differ in topology due to variations in data streams, model parameters, or prior specifications. Furthermore, comparing multiple MCMC chains is essential for assessing convergence. The primary function, `compare_trees`, evaluates the null hypothesis that the supplied trees are drawn from the same underlying distribution by:
+
+1.  Computing pairwise distances between nodes within each tree.
+
+2.  Calculating distances between trees.
+
+3.  Performing PERMANOVA (see [`vegan::adonis2`](https://vegandevs.github.io/vegan/reference/adonis.html)) to test for significant differences between chains.
+
+```{r, eval=FALSE}
+compare_trees(..., f_tree = patristic, f_chain = euclidean, adonis2_args = list())
+```
+
+-   `...`: Lists of data frames containing transmission trees, each with `from` and `to` columns representing case IDs.
+
+-   `f_tree`: Distance function for computing node-to-node distances within trees (returns square matrix).
+
+-   `f_chain`: Distance function for computing tree-to-tree distances (returns square matrix).
+
+-   `adonis2_args`: Additional arguments passed to [`vegan::adonis2()`](https://vegandevs.github.io/vegan/reference/adonis.html).
+
+# Example
+
+## Comparing Models
+
+Suppose you have two distinct models producing transmission trees. Here, we simulate two chains of 100 trees each (with 20 cases per tree). `Chain A` is generated with a reproduction number ($R$) of 2, and `Chain B` with an $R$ of 4.
+
+```{r}
+set.seed(123)
+# Generate 100 trees with R₀ = 2
+chainA <- lapply(1:100, function(i){
+  make_tree(20, R = 2, stochastic = TRUE) |>
+    igraph::as_long_data_frame()
+})
+
+# Generate 100 trees with R₀ = 4
+chainB <- lapply(1:100, function(i){
+  make_tree(20, R = 4, stochastic = TRUE) |>
+     igraph::as_long_data_frame()
+})
+
+compare_chains(chainA, chainB)
+```
+
+A very low p-value indicates that the distributions of trees between the chains differ significantly.
+
+## Using Custom Distance Functions
+
+The package supports custom distance functions, such as the MRCI depth measure described in [Kendall *et al.*(2018)](https://projecteuclid.org/journals/statistical-science/volume-33/issue-1/Estimating-Transmission-from-Genetic-and-Epidemiological-Data--A-Metric/10.1214/17-STS637.full). See also the [vignette](https://thibautjombart.github.io/treespace/articles/TransmissionTreesVignette.html) from `treespace`.
+
+```{r}
+library(treespace)
+mrciDepth <- function(tree) {
+  treespace::findMRCIs(as.matrix(tree))$mrciDepths
+}
+compare_chains(chainA, chainB, f_tree = mrciDepth)
+```
+
+## Assessing Model Convergence
+
+To assess MCMC convergence, compare multiple chains from the same model specification:
+
+```{r}
+chains <- lapply(1:4, function(i) {
+  chain_i <- lapply(1:100, function(j) {
+    make_tree(20, R = 2, stochastic = TRUE) |>
+      igraph::as_long_data_frame()
+  })
+  return(chain_i)
+})
+compare_chains(chains[[1]], chains[[2]], chains[[3]], chains[[4]], adonis2_args = list(permutations = 500))
+```
+
+If the model has converged, the p-value should be high suggesting that the chains are drawn from the same posterior distribution.
+
+### Note
+Randomly shuffling node IDs will not affect the test results if the distance functions are invariant to node labelling. Since the test focuses on the tree’s topology and branch lengths rather than the specific identifiers, metrics such as patristic distances—derived solely from the tree structure—remain unchanged when node IDs are permuted. However, if a custom function depends on the order or specific labels of nodes, then shuffling could influence the results.
+
+```{r}
+chainA <- lapply(1:50, function(i) {
+  make_tree(20, R = 2, stochastic = TRUE)
+})
+
+chainB <- lapply(1:50, function(i) {
+  df <- epitree:::shuffle_graph_ids(chainA[[i]]) |>
+    igraph::as_long_data_frame()
+  subset(df, select = c("from", "to"))
+})
+
+chainA <- lapply(chainA, igraph::as_long_data_frame)
+  
+compare_chains(chainA, chainB)
+
+# In contrast, the Chi-Square test will reject the null as it compare
+# the distribution of of ancestries for each case
+get_chisq(chainA, chainB)
+```

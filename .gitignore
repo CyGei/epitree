@@ -51,3 +51,7 @@ rsconnect/
 .Rproj.user
 
 /.quarto/
+inst/doc
+/doc/
+/Meta/
+docs
