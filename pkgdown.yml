@@ -3,7 +3,7 @@ pkgdown: 2.1.1
 pkgdown_sha: ~
 articles:
   epitree: epitree.html
-last_built: 2025-02-20T00:14Z
+last_built: 2025-02-20T16:24Z
 urls:
   reference: https://cygei.github.io/epitree/reference
   article: https://cygei.github.io/epitree/articles

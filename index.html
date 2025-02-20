@@ -58,7 +58,7 @@
 </h1>
 </div>
 <!-- badges: start -->
-<!-- badges: end -->
+
 <p>The <code>epitree</code> package provides a statistical framework for comparing posterior distributions of transmission trees (<em>and soon</em>, phylogenetic trees) generated through Bayesian inference. It employs PERMANOVA (via <a href="https://vegandevs.github.io/vegan/reference/adonis.html" class="external-link"><code>vegan::adonis2</code></a>) to assess whether trees from different models or MCMC chains stem from the same underlying distribution.</p>
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
@@ -113,9 +113,9 @@
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; (function (formula, data, permutations = 999, method = "bray", sqrt.dist = FALSE, add = FALSE, by = NULL, parallel = getOption("mc.cores"), na.action = na.fail, strata = NULL, ...) </span></span>
 <span><span class="co">#&gt;           Df SumOfSqs      R2      F Pr(&gt;F)    </span></span>
-<span><span class="co">#&gt; Model      1     7965 0.14791 34.371  0.001 ***</span></span>
-<span><span class="co">#&gt; Residual 198    45884 0.85209                  </span></span>
-<span><span class="co">#&gt; Total    199    53850 1.00000                  </span></span>
+<span><span class="co">#&gt; Model      1     6605 0.12363 27.932  0.001 ***</span></span>
+<span><span class="co">#&gt; Residual 198    46820 0.87637                  </span></span>
+<span><span class="co">#&gt; Total    199    53425 1.00000                  </span></span>
 <span><span class="co">#&gt; ---</span></span>
 <span><span class="co">#&gt; Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span></span></code></pre></div>
 </div>
@@ -139,11 +139,16 @@
 <div class="developers">
 <h2 data-toc-skip>Developers</h2>
 <ul class="list-unstyled">
-<li>Cyril Geismar <br><small class="roles"> Author, maintainer </small> <a href="https://orcid.org/YOUR-ORCID-ID" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a> </li>
+<li>Cyril Geismar <br><small class="roles"> Author, maintainer, copyright holder </small> <a href="https://orcid.org/YOUR-ORCID-ID" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a> </li>
 </ul>
 </div>
 
-
+<div class="dev-status">
+<h2 data-toc-skip>Dev status</h2>
+<ul class="list-unstyled">
+<li><a href="https://github.com/CyGei/epitree/actions/workflows/R-CMD-check.yaml" class="external-link"><img src="https://github.com/CyGei/epitree/actions/workflows/R-CMD-check.yaml/badge.svg" alt="R-CMD-check"></a></li>
+</ul>
+</div>
 
   </aside>
 </div>
