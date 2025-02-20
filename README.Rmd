@@ -16,6 +16,7 @@ knitr::opts_chunk$set(
 # epitree
 
 <!-- badges: start -->
+[![R-CMD-check](https://github.com/CyGei/epitree/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/CyGei/epitree/actions/workflows/R-CMD-check.yaml)
 <!-- badges: end -->
 
 The `epitree` package provides a statistical framework for comparing posterior distributions of transmission trees (*and soon*, phylogenetic trees) generated through Bayesian inference. It employs PERMANOVA (via [`vegan::adonis2`](https://vegandevs.github.io/vegan/reference/adonis.html)) to assess whether trees from different models or MCMC chains stem from the same underlying distribution.

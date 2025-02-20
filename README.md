@@ -4,6 +4,8 @@
 # epitree
 
 <!-- badges: start -->
+
+[![R-CMD-check](https://github.com/CyGei/epitree/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/CyGei/epitree/actions/workflows/R-CMD-check.yaml)
 <!-- badges: end -->
 
 The `epitree` package provides a statistical framework for comparing
@@ -66,9 +68,9 @@ print(result)
 #> 
 #> (function (formula, data, permutations = 999, method = "bray", sqrt.dist = FALSE, add = FALSE, by = NULL, parallel = getOption("mc.cores"), na.action = na.fail, strata = NULL, ...) 
 #>           Df SumOfSqs      R2      F Pr(>F)    
-#> Model      1     7965 0.14791 34.371  0.001 ***
-#> Residual 198    45884 0.85209                  
-#> Total    199    53850 1.00000                  
+#> Model      1     6605 0.12363 27.932  0.001 ***
+#> Residual 198    46820 0.87637                  
+#> Total    199    53425 1.00000                  
 #> ---
 #> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ```

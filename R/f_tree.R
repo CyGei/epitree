@@ -63,7 +63,9 @@ abouheif <- function(tree) {
 
 
 #' Compute the Kendall distance matrix
+#'
 #' Kendall's distance measures the depth of the most recent common infector (MRCI) for each pair of nodes with respect to the source (patient 0).
+#'
 #' @param tree A data frame representing a transmission tree, with the first column containing the infector IDs and the second the infectee IDs.
 #' @return A square, symmetric matrix of Kendall's distances between nodes.
 #' @examples
@@ -71,7 +73,7 @@ abouheif <- function(tree) {
 #' kendall(tree)
 #' @importFrom treespace findMRCIs
 #' @references
-#' A Metric to Compare Transmission Trees - M Kendall · 2018 
+#' A Metric to Compare Transmission Trees - M Kendall · 2018
 #' @seealso \code{\link[treespace]{findMRCIs}}
 #' @export
 kendall <- function(tree) {

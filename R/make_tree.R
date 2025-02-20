@@ -3,7 +3,7 @@
 #' Creates a transmission tree with a specified number of cases and branches per case.
 #' The tree can be generated with fixed or Poisson-distributed branching factors.
 #'
-#' @param num_cases Integer. The total number of cases (nodes) in the tree.
+#' @param n_cases Integer. The total number of cases (nodes) in the tree.
 #' @param R Integer. The fixed number of branches per case when \code{stochastic} is \code{FALSE},
 #'           or the mean of the Poisson distribution when \code{stochastic} is \code{TRUE}.
 #' @param stochastic Logical. If \code{TRUE}, the number of branches per case is sampled from
@@ -14,18 +14,18 @@
 #' @importFrom stats rpois
 #' @examples
 #' # Generate a deterministic transmission tree
-#' deterministic_tree <- make_tree(num_cases = 15, R = 2, stochastic = FALSE, plot = TRUE)
+#' deterministic_tree <- make_tree(n_cases = 15, R = 2, stochastic = FALSE, plot = TRUE)
 #'
 #' # Generate a stochastic transmission tree
-#' random_tree <- make_tree(num_cases = 15, R = 2, stochastic = TRUE, plot = TRUE)
+#' random_tree <- make_tree(n_cases = 15, R = 2, stochastic = TRUE, plot = TRUE)
 #' @export
 
-make_tree <- function(num_cases, R = 2, stochastic = FALSE, plot = FALSE) {
+make_tree <- function(n_cases, R = 2, stochastic = FALSE, plot = FALSE) {
   edges <- c()
   current_nodes <- 1
   next_node <- 2
 
-  while(next_node <= num_cases) {
+  while(next_node <= n_cases) {
     new_nodes <- c()
     for(node in current_nodes) {
       # Determine the branching factor
@@ -36,7 +36,7 @@ make_tree <- function(num_cases, R = 2, stochastic = FALSE, plot = FALSE) {
       }
 
       for(i in 1:R_current) {
-        if(next_node > num_cases) {
+        if(next_node > n_cases) {
           break
         }
         # Add an edge from the current node to the next node
@@ -83,7 +83,7 @@ make_tree <- function(num_cases, R = 2, stochastic = FALSE, plot = FALSE) {
 #' @importFrom igraph vcount permute V layout_as_tree
 #' @examples
 #' # Create an example graph
-#' g <- make_tree(num_cases = 10, R = 2)
+#' g <- make_tree(n_cases = 10, R = 2)
 #'
 #' # Shuffle the node IDs
 #' shuffled_graph <- shuffle_graph_ids(g, plot = TRUE)

@@ -2,8 +2,7 @@
 % Please edit documentation in R/f_tree.R
 \name{kendall}
 \alias{kendall}
-\title{Compute the Kendall distance matrix
-Kendall's distance measures the depth of the most recent common infector (MRCI) for each pair of nodes with respect to the source (patient 0).}
+\title{Compute the Kendall distance matrix}
 \usage{
 kendall(tree)
 }
@@ -14,7 +13,6 @@ kendall(tree)
 A square, symmetric matrix of Kendall's distances between nodes.
 }
 \description{
-Compute the Kendall distance matrix
 Kendall's distance measures the depth of the most recent common infector (MRCI) for each pair of nodes with respect to the source (patient 0).
 }
 \examples{

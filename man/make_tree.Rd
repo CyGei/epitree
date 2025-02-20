@@ -4,10 +4,10 @@
 \alias{make_tree}
 \title{Generate a Transmission Tree}
 \usage{
-make_tree(num_cases, R = 2, stochastic = FALSE, plot = FALSE)
+make_tree(n_cases, R = 2, stochastic = FALSE, plot = FALSE)
 }
 \arguments{
-\item{num_cases}{Integer. The total number of cases (nodes) in the tree.}
+\item{n_cases}{Integer. The total number of cases (nodes) in the tree.}
 
 \item{R}{Integer. The fixed number of branches per case when \code{stochastic} is \code{FALSE},
 or the mean of the Poisson distribution when \code{stochastic} is \code{TRUE}.}
@@ -26,8 +26,8 @@ The tree can be generated with fixed or Poisson-distributed branching factors.
 }
 \examples{
 # Generate a deterministic transmission tree
-deterministic_tree <- make_tree(num_cases = 15, R = 2, stochastic = FALSE, plot = TRUE)
+deterministic_tree <- make_tree(n_cases = 15, R = 2, stochastic = FALSE, plot = TRUE)
 
 # Generate a stochastic transmission tree
-random_tree <- make_tree(num_cases = 15, R = 2, stochastic = TRUE, plot = TRUE)
+random_tree <- make_tree(n_cases = 15, R = 2, stochastic = TRUE, plot = TRUE)
 }

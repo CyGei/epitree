@@ -14,11 +14,27 @@
 #'
 #' @return A `vegan::adonis2` object containing the results of the PERMANOVA.
 #'
-#'
 #' @importFrom igraph graph_from_data_frame distances
 #' @importFrom vegan adonis2
 #' @importFrom stats as.dist
 #' @importFrom utils combn
+#'
+#' @examples
+#' set.seed(1)
+#' #No difference in the chains
+#' chainA <- replicate(10, igraph::as_long_data_frame(
+#'   make_tree(n_cases = 10, R = 2, stochastic = TRUE)),
+#'   simplify = FALSE)
+#' chainB <- replicate(10, igraph::as_long_data_frame(
+#'   make_tree(n_cases = 10, R = 2, stochastic = TRUE)),
+#'   simplify = FALSE)
+#' compare_chains(chainA, chainB)
+#'
+#' #Difference in the chains
+#' chainC <- replicate(10, igraph::as_long_data_frame(
+#'   make_tree(n_cases = 10, R = 4, stochastic = TRUE)),
+#'   simplify = FALSE)
+#' compare_chains(chainA, chainB, chainC)
 #' @export
 
 compare_chains <- function(...,

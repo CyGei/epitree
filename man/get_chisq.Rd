@@ -20,3 +20,20 @@ A list of class \code{htest} containing the test results.
 \description{
 Test whether the distribution of infector-infectee pairs differs between chains.
 }
+\examples{
+set.seed(1)
+#No difference in the chains
+chainA <- replicate(10, igraph::as_long_data_frame(
+  make_tree(n_cases = 10, R = 2, stochastic = TRUE)),
+  simplify = FALSE)
+chainB <- replicate(10, igraph::as_long_data_frame(
+  make_tree(n_cases = 10, R = 2, stochastic = TRUE)),
+  simplify = FALSE)
+get_chisq(chainA, chainB)
+
+#Difference in the chains
+chainC <- replicate(10, igraph::as_long_data_frame(
+  make_tree(n_cases = 10, R = 4, stochastic = TRUE)),
+  simplify = FALSE)
+get_chisq(chainA, chainB, chainC)
+}

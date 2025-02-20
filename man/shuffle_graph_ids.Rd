@@ -19,7 +19,7 @@ Randomly shuffles the IDs of the nodes in a given graph and optionally plots the
 }
 \examples{
 # Create an example graph
-g <- make_tree(num_cases = 10, R = 2)
+g <- make_tree(n_cases = 10, R = 2)
 
 # Shuffle the node IDs
 shuffled_graph <- shuffle_graph_ids(g, plot = TRUE)

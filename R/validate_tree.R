@@ -6,6 +6,13 @@
 #' @param tree A data frame with columns `from` and `to` representing the transmission tree.
 #'
 #' @return Invisible `TRUE` if the tree is valid. Throws an error if invalid.
+#'
+#' @importFrom igraph graph_from_data_frame is_dag is_connected degree
+#' @examples
+#' good_tree <- data.frame(from = c(1,2,3), to = c(2,3,4))
+#' validate_tree(good_tree)
+#' bad_tree <- data.frame(from = c(1, 2, 3), to = c(2, 3, 2))
+#' try(validate_tree(bad_tree))
 #' @export
 validate_tree <- function(tree) {
   # Validate input
