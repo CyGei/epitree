@@ -1,0 +1,134 @@
+---
+title: "mixtree"
+author: "Cyril Geismar"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{mixtree}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(mixtree)
+```
+
+# Introduction
+
+The `mixtree` package provides a statistical framework for comparing sets of trees. The function `tree_test()`, can apply various hypothesis testing approaches to assess differences between tree sets. While currently supporting transmission trees, future updates will expand functionality to include phylogenetic trees and, more generally, directed acyclic graphs (DAGs) .
+
+# Methods
+
+The package implements the following testing methods:
+
+-   **PERMANOVA**: Evaluates whether the topological distribution of trees differs between sets.
+
+    -   **Null Hypothesis** (H0): Transmission trees in all sets are drawn from the same distribution, implying similar topologies.
+
+    -   **Alternative Hypothesis** (H1): At least one set of transmission trees comes from a different distribution.
+
+-   **Chi-Square** or **Fisher’s Exact Test**: Evaluates whether the distribution of ancestor-descendant pairs differs between sets.
+
+    -   Null Hypothesis (H0): The frequency of ancestor-descendant pairs is consistent across all sets.
+
+    -   Alternative Hypothesis (H1): The frequency of ancestor-descendant pairs differs between at least two sets.
+
+# Input Requirements
+
+Each input set must be a list of data frames. Every data frame represents a tree and must contain exactly two columns:
+
+-   `from`: The parent node (or infector).
+
+-   `to`: The child node (or infectee).
+
+`make_tree` is a helper function that simulates a DAG with the number of branches per node drawn from a Poisson distribution with $\lambda$ = `R` when `stochastic = TRUE`
+
+```{r make_tree}
+ make_tree(20, R = 2, stochastic = TRUE, plot = TRUE)
+```
+
+# Usage
+
+The unified interface is provided by the `tree_test()` function. Users can supply two or more sets of trees and select the desired testing method via the `method` parameter.
+
+## PERMANOVA
+
+```{r permanova}
+set.seed(123)
+# Generate 100 trees with R₀ = 2
+chainA <- lapply(1:100, function(i){
+  make_tree(20, R = 2, stochastic = TRUE) |>
+    igraph::as_long_data_frame()
+})
+
+# Generate 100 trees with R₀ = 4
+chainB <- lapply(1:100, function(i){
+  make_tree(20, R = 4, stochastic = TRUE) |>
+     igraph::as_long_data_frame()
+})
+
+tree_test(chainA, chainB, method = "permanova")
+```
+
+The p-value is below the 5% significance level, we reject the null hypothesis of no difference.
+
+## Chi-Square Test
+
+```{r chisq}
+tree_test(chainA, chainB, method = "chisq", test_args = list(simulate.p.value = TRUE, B = 999))
+
+```
+
+# Advanced Usage
+
+The `tree_test()` function accepts additional parameters to customise the testing process:
+
+-   `within_dist`: A function to compute pairwise distances within a tree (used with PERMANOVA). Default is `patristic`.
+
+-   `between_dist`: A function to compute the distance between two trees (used with PERMANOVA). Default is `euclidean`.
+
+-   `test_args`: A list of extra arguments passed to the underlying test function (i.e. `vegan::adonis2`,`stats::chisq.test`, or `stats::fisher.test`).
+
+## Using Custom Distance Functions
+
+The package supports custom distance functions, such as the MRCI depth measure described in [Kendall *et al.*(2018)](https://projecteuclid.org/journals/statistical-science/volume-33/issue-1/Estimating-Transmission-from-Genetic-and-Epidemiological-Data--A-Metric/10.1214/17-STS637.full). See also the [vignette](https://thibautjombart.github.io/treespace/articles/TransmissionTreesVignette.html) from `treespace`.
+
+```{r treespace}
+library(treespace)
+mrciDepth <- function(tree) {
+ treespace::findMRCIs(as.matrix(tree))$mrciDepths
+}
+tree_test(chainA, chainB, within_dist = mrciDepth)
+```
+
+### Note
+
+Randomly shuffling node IDs will not affect the test results if the distance functions are invariant to node labelling. Since the test focuses on the tree’s topology and branch lengths rather than the specific identifiers, metrics such as patristic distances—derived solely from the tree structure—remain unchanged when node IDs are permuted. However, if a custom function depends on the order or specific labels of nodes, then shuffling could influence the results.
+
+```{r shuffle_graph_ids}
+chainA <- lapply(1:50, function(i) {
+  make_tree(20, R = 2, stochastic = TRUE)
+})
+chainB <- lapply(1:50, function(i) {
+  df <- mixtree:::shuffle_graph_ids(chainA[[i]]) |>
+    igraph::as_long_data_frame()
+  subset(df, select = c("from", "to"))
+})
+chainA <- lapply(chainA, igraph::as_long_data_frame)
+  
+tree_test(chainA, chainB, method = "permanova")
+
+# In contrast, the Chi-Square test will reject the null as it compare the distribution of of ancestries for each case
+tree_test(chainA, chainB, method = "chisq")
+```
+
+# Future Developments
+
+While the current implementation focuses on transmission trees, the package is designed with extensibility in mind. Future versions will support phylogenetic trees and Directed Acyclic Graphs (DAGs) more generally.

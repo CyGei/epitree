@@ -1,34 +1,30 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# epitree
+# mixtree
 
 <!-- badges: start -->
 
-[![R-CMD-check](https://github.com/CyGei/epitree/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/CyGei/epitree/actions/workflows/R-CMD-check.yaml)
+[![R-CMD-check](https://github.com/CyGei/mixtree/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/CyGei/mixtree/actions/workflows/R-CMD-check.yaml)
 <!-- badges: end -->
 
-The `epitree` package provides a statistical framework for comparing
-posterior distributions of transmission trees (*and soon*, phylogenetic
-trees) generated through Bayesian inference. It employs PERMANOVA (via
-[`vegan::adonis2`](https://vegandevs.github.io/vegan/reference/adonis.html))
-to assess whether trees from different models or MCMC chains stem from
-the same underlying distribution.
+The `mixtree` package provides a statistical framework for comparing
+sets of trees.
 
 ## Installation
 
-You can install the development version of epitree from
+You can install the development version of mixtree from
 [GitHub](https://github.com/) with:
 
 ``` r
 # install.packages("pak")
-pak::pak("CyGei/epitree")
+pak::pak("CyGei/mixtree")
 ```
 
 # Quick start
 
 ``` r
-library(epitree)
+library(mixtree)
 #> Registered S3 methods overwritten by 'adegraphics':
 #>   method         from
 #>   biplot.dudi    ade4
@@ -58,7 +54,7 @@ chainB <- lapply(1:100, function(i) {
 })
 
 # Compare the two chains
-result <- compare_chains(chainA, chainB)
+result <- tree_test(chainA, chainB)
 #> Warning in att$heading[2] <- deparse(match.call(), width.cutoff = 500L): number
 #> of items to replace is not a multiple of replacement length
 print(result)
@@ -68,9 +64,9 @@ print(result)
 #> 
 #> (function (formula, data, permutations = 999, method = "bray", sqrt.dist = FALSE, add = FALSE, by = NULL, parallel = getOption("mc.cores"), na.action = na.fail, strata = NULL, ...) 
 #>           Df SumOfSqs      R2      F Pr(>F)    
-#> Model      1     6605 0.12363 27.932  0.001 ***
-#> Residual 198    46820 0.87637                  
-#> Total    199    53425 1.00000                  
+#> Model      1     7014 0.12621 28.599  0.001 ***
+#> Residual 198    48558 0.87379                  
+#> Total    199    55572 1.00000                  
 #> ---
 #> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ```

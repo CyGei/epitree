@@ -1,12 +1,10 @@
-Package: epitree
-Title: Statistical Comparison of Transmission and Phylogenetic Tree Distributions
+Package: mixtree
+Title: A Statistical Framework for Comparing Sets of Trees
 Version: 0.0.0.9000
 Authors@R: 
     person("Cyril", "Geismar", , "c.geismar21@imperial.ac.uk", role = c("aut", "cre", "cph"),
            comment = c(ORCID = "YOUR-ORCID-ID"))
-Description: Implements statistical methods for comparing posterior distributions 
-    of transmission and phylogenetic trees using permutational multivariate 
-    analysis of variance (PERMANOVA).
+Description: Apply hypothesis testing methods to assess differences between sets of trees.
 License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
@@ -16,4 +14,4 @@ Suggests:
     knitr,
     rmarkdown
 VignetteBuilder: knitr
-URL: https://cygei.github.io/epitree/
+URL: https://cygei.github.io/mixtree/
