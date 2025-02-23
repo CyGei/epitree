@@ -2,21 +2,22 @@
 <url><loc>https://cygei.github.io/epitree/404.html</loc></url>
 <url><loc>https://cygei.github.io/epitree/LICENSE-text.html</loc></url>
 <url><loc>https://cygei.github.io/epitree/LICENSE.html</loc></url>
-<url><loc>https://cygei.github.io/epitree/articles/epitree.html</loc></url>
 <url><loc>https://cygei.github.io/epitree/articles/index.html</loc></url>
+<url><loc>https://cygei.github.io/epitree/articles/mixtree.html</loc></url>
 <url><loc>https://cygei.github.io/epitree/authors.html</loc></url>
 <url><loc>https://cygei.github.io/epitree/index.html</loc></url>
 <url><loc>https://cygei.github.io/epitree/reference/abouheif.html</loc></url>
-<url><loc>https://cygei.github.io/epitree/reference/compare_chains.html</loc></url>
+<url><loc>https://cygei.github.io/epitree/reference/chisq_test.html</loc></url>
 <url><loc>https://cygei.github.io/epitree/reference/euclidean.html</loc></url>
-<url><loc>https://cygei.github.io/epitree/reference/get_chisq.html</loc></url>
 <url><loc>https://cygei.github.io/epitree/reference/index.html</loc></url>
 <url><loc>https://cygei.github.io/epitree/reference/kendall.html</loc></url>
 <url><loc>https://cygei.github.io/epitree/reference/make_tree.html</loc></url>
 <url><loc>https://cygei.github.io/epitree/reference/patristic.html</loc></url>
-<url><loc>https://cygei.github.io/epitree/reference/process_tree.html</loc></url>
-<url><loc>https://cygei.github.io/epitree/reference/remove_intro.html</loc></url>
+<url><loc>https://cygei.github.io/epitree/reference/permanova_test.html</loc></url>
 <url><loc>https://cygei.github.io/epitree/reference/shuffle_graph_ids.html</loc></url>
+<url><loc>https://cygei.github.io/epitree/reference/tree_test.html</loc></url>
+<url><loc>https://cygei.github.io/epitree/reference/validate_set.html</loc></url>
+<url><loc>https://cygei.github.io/epitree/reference/validate_sets.html</loc></url>
 <url><loc>https://cygei.github.io/epitree/reference/validate_tree.html</loc></url>
 </urlset>
 
