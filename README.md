@@ -25,23 +25,6 @@ pak::pak("CyGei/mixtree")
 
 ``` r
 library(mixtree)
-#> Registered S3 methods overwritten by 'adegraphics':
-#>   method         from
-#>   biplot.dudi    ade4
-#>   kplot.foucart  ade4
-#>   kplot.mcoa     ade4
-#>   kplot.mfa      ade4
-#>   kplot.pta      ade4
-#>   kplot.sepan    ade4
-#>   kplot.statis   ade4
-#>   scatter.coa    ade4
-#>   scatter.dudi   ade4
-#>   scatter.nipals ade4
-#>   scatter.pco    ade4
-#>   score.acm      ade4
-#>   score.mix      ade4
-#>   score.pca      ade4
-#>   screeplot.dudi ade4
 
 # Simulate two chains of transmission trees
 chainA <- lapply(1:100, function(i) {
@@ -55,8 +38,6 @@ chainB <- lapply(1:100, function(i) {
 
 # Compare the two chains
 result <- tree_test(chainA, chainB)
-#> Warning in att$heading[2] <- deparse(match.call(), width.cutoff = 500L): number
-#> of items to replace is not a multiple of replacement length
 print(result)
 #> Permutation test for adonis under reduced model
 #> Permutation: free
@@ -64,9 +45,9 @@ print(result)
 #> 
 #> (function (formula, data, permutations = 999, method = "bray", sqrt.dist = FALSE, add = FALSE, by = NULL, parallel = getOption("mc.cores"), na.action = na.fail, strata = NULL, ...) 
 #>           Df SumOfSqs      R2      F Pr(>F)    
-#> Model      1     7014 0.12621 28.599  0.001 ***
-#> Residual 198    48558 0.87379                  
-#> Total    199    55572 1.00000                  
+#> Model      1     6730 0.13248 30.236  0.001 ***
+#> Residual 198    44071 0.86752                  
+#> Total    199    50801 1.00000                  
 #> ---
 #> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ```

@@ -12,7 +12,9 @@ vignette: >
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
-  comment = "#>"
+  comment = "#>",
+  message = FALSE,
+  warning = FALSE
 )
 ```
 
@@ -110,7 +112,7 @@ tree_test(chainA, chainB, within_dist = mrciDepth)
 
 ### Note
 
-Randomly shuffling node IDs will not affect the test results if the distance functions are invariant to node labelling. Since the test focuses on the tree’s topology and branch lengths rather than the specific identifiers, metrics such as patristic distances—derived solely from the tree structure—remain unchanged when node IDs are permuted. However, if a custom function depends on the order or specific labels of nodes, then shuffling could influence the results.
+Randomly shuffling node IDs will not affect the PERMANOVA test results if the distance functions are invariant to node labelling. Since the test focuses on the tree’s topology and branch lengths rather than the specific identifiers, metrics such as patristic distances—derived solely from the tree structure—remain unchanged when node IDs are permuted. However, if a custom function depends on the order or specific labels of nodes, then shuffling could influence the results.
 
 ```{r shuffle_graph_ids}
 chainA <- lapply(1:50, function(i) {
