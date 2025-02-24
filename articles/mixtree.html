@@ -58,7 +58,7 @@
                         <h4 data-toc-skip class="author">Cyril
 Geismar</h4>
             
-            <h4 data-toc-skip class="date">2025-02-23</h4>
+            <h4 data-toc-skip class="date">2025-02-24</h4>
       
 
       <div class="d-none name"><code>mixtree.Rmd</code></div>
@@ -67,27 +67,7 @@ Geismar</h4>
     
     
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://cygei.github.io/mixtree/" class="external-link">mixtree</a></span><span class="op">)</span></span>
-<span><span class="co">#&gt; Warning in rgl.init(initValue, onlyNULL): RGL: unable to open X11 display</span></span>
-<span><span class="co">#&gt; Warning: 'rgl.init' failed, will use the null device.</span></span>
-<span><span class="co">#&gt; See '?rgl.useNULL' for ways to avoid this warning.</span></span>
-<span><span class="co">#&gt; Registered S3 methods overwritten by 'adegraphics':</span></span>
-<span><span class="co">#&gt;   method         from</span></span>
-<span><span class="co">#&gt;   biplot.dudi    ade4</span></span>
-<span><span class="co">#&gt;   kplot.foucart  ade4</span></span>
-<span><span class="co">#&gt;   kplot.mcoa     ade4</span></span>
-<span><span class="co">#&gt;   kplot.mfa      ade4</span></span>
-<span><span class="co">#&gt;   kplot.pta      ade4</span></span>
-<span><span class="co">#&gt;   kplot.sepan    ade4</span></span>
-<span><span class="co">#&gt;   kplot.statis   ade4</span></span>
-<span><span class="co">#&gt;   scatter.coa    ade4</span></span>
-<span><span class="co">#&gt;   scatter.dudi   ade4</span></span>
-<span><span class="co">#&gt;   scatter.nipals ade4</span></span>
-<span><span class="co">#&gt;   scatter.pco    ade4</span></span>
-<span><span class="co">#&gt;   score.acm      ade4</span></span>
-<span><span class="co">#&gt;   score.mix      ade4</span></span>
-<span><span class="co">#&gt;   score.pca      ade4</span></span>
-<span><span class="co">#&gt;   screeplot.dudi ade4</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://cygei.github.io/mixtree/" class="external-link">mixtree</a></span><span class="op">)</span></span></code></pre></div>
 <div class="section level2">
 <h2 id="introduction">Introduction<a class="anchor" aria-label="anchor" href="#introduction"></a>
 </h2>
@@ -143,8 +123,8 @@ the number of branches per node drawn from a Poisson distribution with
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span> <span class="fu"><a href="../reference/make_tree.html">make_tree</a></span><span class="op">(</span><span class="fl">20</span>, R <span class="op">=</span> <span class="fl">2</span>, stochastic <span class="op">=</span> <span class="cn">TRUE</span>, plot <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
 <p><img src="mixtree_files/figure-html/make_tree-1.png" width="700"></p>
-<pre><code><span><span class="co">#&gt; IGRAPH 6beb30d D--- 20 19 -- </span></span>
-<span><span class="co">#&gt; + edges from 6beb30d:</span></span>
+<pre><code><span><span class="co">#&gt; IGRAPH c655255 D--- 20 19 -- </span></span>
+<span><span class="co">#&gt; + edges from c655255:</span></span>
 <span><span class="co">#&gt;  [1]  1-&gt; 2  1-&gt; 3  2-&gt; 4  2-&gt; 5  2-&gt; 6  3-&gt; 7  3-&gt; 8  4-&gt; 9  5-&gt;10  5-&gt;11</span></span>
 <span><span class="co">#&gt; [11]  6-&gt;12  6-&gt;13  7-&gt;14  7-&gt;15  8-&gt;16  9-&gt;17  9-&gt;18  9-&gt;19 10-&gt;20</span></span></code></pre>
 </div>
@@ -172,8 +152,6 @@ desired testing method via the <code>method</code> parameter.</p>
 <span><span class="op">}</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="../reference/tree_test.html">tree_test</a></span><span class="op">(</span><span class="va">chainA</span>, <span class="va">chainB</span>, method <span class="op">=</span> <span class="st">"permanova"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Warning in att$heading[2] &lt;- deparse(match.call(), width.cutoff = 500L): number</span></span>
-<span><span class="co">#&gt; of items to replace is not a multiple of replacement length</span></span>
 <span><span class="co">#&gt; Permutation test for adonis under reduced model</span></span>
 <span><span class="co">#&gt; Permutation: free</span></span>
 <span><span class="co">#&gt; Number of permutations: 999</span></span>
@@ -227,14 +205,10 @@ depth measure described in <a href="https://projecteuclid.org/journals/statistic
 from <code>treespace</code>.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://cran.r-project.org/package=treespace" class="external-link">treespace</a></span><span class="op">)</span></span>
-<span><span class="co">#&gt; Loading required package: ape</span></span>
-<span><span class="co">#&gt; Loading required package: ade4</span></span>
 <span><span class="va">mrciDepth</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">tree</span><span class="op">)</span> <span class="op">{</span></span>
 <span> <span class="fu">treespace</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/treespace/man/findMRCIs.html" class="external-link">findMRCIs</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">as.matrix</a></span><span class="op">(</span><span class="va">tree</span><span class="op">)</span><span class="op">)</span><span class="op">$</span><span class="va">mrciDepths</span></span>
 <span><span class="op">}</span></span>
 <span><span class="fu"><a href="../reference/tree_test.html">tree_test</a></span><span class="op">(</span><span class="va">chainA</span>, <span class="va">chainB</span>, within_dist <span class="op">=</span> <span class="va">mrciDepth</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Warning in att$heading[2] &lt;- deparse(match.call(), width.cutoff = 500L): number</span></span>
-<span><span class="co">#&gt; of items to replace is not a multiple of replacement length</span></span>
 <span><span class="co">#&gt; Permutation test for adonis under reduced model</span></span>
 <span><span class="co">#&gt; Permutation: free</span></span>
 <span><span class="co">#&gt; Number of permutations: 999</span></span>
@@ -249,13 +223,13 @@ from <code>treespace</code>.</p>
 <div class="section level4">
 <h4 id="note">Note<a class="anchor" aria-label="anchor" href="#note"></a>
 </h4>
-<p>Randomly shuffling node IDs will not affect the test results if the
-distance functions are invariant to node labelling. Since the test
-focuses on the tree’s topology and branch lengths rather than the
-specific identifiers, metrics such as patristic distances—derived solely
-from the tree structure—remain unchanged when node IDs are permuted.
-However, if a custom function depends on the order or specific labels of
-nodes, then shuffling could influence the results.</p>
+<p>Randomly shuffling node IDs will not affect the PERMANOVA test
+results if the distance functions are invariant to node labelling. Since
+the test focuses on the tree’s topology and branch lengths rather than
+the specific identifiers, metrics such as patristic distances—derived
+solely from the tree structure—remain unchanged when node IDs are
+permuted. However, if a custom function depends on the order or specific
+labels of nodes, then shuffling could influence the results.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">chainA</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">50</span>, <span class="kw">function</span><span class="op">(</span><span class="va">i</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="fu"><a href="../reference/make_tree.html">make_tree</a></span><span class="op">(</span><span class="fl">20</span>, R <span class="op">=</span> <span class="fl">2</span>, stochastic <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
@@ -268,8 +242,6 @@ nodes, then shuffling could influence the results.</p>
 <span><span class="va">chainA</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="va">chainA</span>, <span class="fu">igraph</span><span class="fu">::</span><span class="va"><a href="https://r.igraph.org/reference/as_long_data_frame.html" class="external-link">as_long_data_frame</a></span><span class="op">)</span></span>
 <span>  </span>
 <span><span class="fu"><a href="../reference/tree_test.html">tree_test</a></span><span class="op">(</span><span class="va">chainA</span>, <span class="va">chainB</span>, method <span class="op">=</span> <span class="st">"permanova"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Warning in att$heading[2] &lt;- deparse(match.call(), width.cutoff = 500L): number</span></span>
-<span><span class="co">#&gt; of items to replace is not a multiple of replacement length</span></span>
 <span><span class="co">#&gt; Permutation test for adonis under reduced model</span></span>
 <span><span class="co">#&gt; Permutation: free</span></span>
 <span><span class="co">#&gt; Number of permutations: 999</span></span>
@@ -282,8 +254,6 @@ nodes, then shuffling could influence the results.</p>
 <span></span>
 <span><span class="co"># In contrast, the Chi-Square test will reject the null as it compare the distribution of of ancestries for each case</span></span>
 <span><span class="fu"><a href="../reference/tree_test.html">tree_test</a></span><span class="op">(</span><span class="va">chainA</span>, <span class="va">chainB</span>, method <span class="op">=</span> <span class="st">"chisq"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Warning in (function (x, y = NULL, correct = TRUE, p = rep(1/length(x), :</span></span>
-<span><span class="co">#&gt; Chi-squared approximation may be incorrect</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;  Pearson's Chi-squared test</span></span>
 <span><span class="co">#&gt; </span></span>
