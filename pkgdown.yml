@@ -3,7 +3,7 @@ pkgdown: 2.1.1
 pkgdown_sha: ~
 articles:
   mixtree: mixtree.html
-last_built: 2025-02-25T14:54Z
+last_built: 2025-02-25T16:20Z
 urls:
   reference: https://cygei.github.io/epitree/reference
   article: https://cygei.github.io/epitree/articles
