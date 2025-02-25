@@ -3,7 +3,7 @@ Title: A Statistical Framework for Comparing Sets of Trees
 Version: 0.0.0.9000
 Authors@R: 
     person("Cyril", "Geismar", , "c.geismar21@imperial.ac.uk", role = c("aut", "cre", "cph"),
-           comment = c(ORCID = "YOUR-ORCID-ID"))
+           comment = c(ORCID = "0000-0002-8486-5890"))
 Description: Apply hypothesis testing methods to assess differences between sets of trees.
 License: MIT + file LICENSE
 Encoding: UTF-8
